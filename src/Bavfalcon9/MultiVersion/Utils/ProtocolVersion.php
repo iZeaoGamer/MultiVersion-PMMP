@@ -48,8 +48,10 @@ class ProtocolVersion {
     }
 
     public function changePacket(String &$name, DataPacket &$oldPacket): ?DataPacket {
-        if (!isset($this->protocolPackets[$name])) return null;
-        
+        if (!isset($this->protocolPackets[$name]) && $this->restricted === true) return null;
+        if (!isset($this->protocolPackets[$name])) {
+            return $oldPacket;
+        }
         $pk = $this->dir . $this->protocolPackets[$name];
         $pk = new $pk;
         
