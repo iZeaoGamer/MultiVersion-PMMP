@@ -124,6 +124,8 @@ class StartGamePacket extends DataPacket{
 	public $blockTable = null;
 	/** @var array|null string (name) => int16 (legacyID) */
 	public $itemTable = null;
+	public $customTranslation = true;
+
 	protected function decodePayload(){
 		$this->entityUniqueId = $this->getEntityUniqueId();
 		$this->entityRuntimeId = $this->getEntityRuntimeId();
@@ -240,7 +242,7 @@ class StartGamePacket extends DataPacket{
 		}
 		if($this->itemTable === null){
 			if(self::$itemTableCache === null){
-				self::$itemTableCache = self::serializeItemTable(json_decode(file_get_contents(MULTIVERSION_v1_12_0. '/vanilla/item_id_map.json'), true));
+				self::$itemTableCache = self::serializeItemTable(json_decode(file_get_contents(MULTIVERSION_v1_12_0. '/item_id_map.json'), true));
 			}
 			$this->put(self::$itemTableCache);
 		}else{
@@ -269,5 +271,55 @@ class StartGamePacket extends DataPacket{
 	}
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleStartGame($this);
+	}
+	public function translateCustomPacket($packet) {
+		$this->spawnX = $packet->spawnX;
+		$this->spawnY = $packet->spawnY;
+		$this->spawnZ = $packet->spawnZ;
+		$this->entityUniqueId = $packet->entityUniqueId;
+		$this->entityRuntimeId = $packet->entityRuntimeId;
+		$this->playerGamemode = $packet->playerGamemode;
+		$this->playerPosition = $packet->playerPosition;
+		$this->pitch = $packet->pitch;
+		$this->yaw = $packet->yaw;
+		//Level settings
+		$this->seed = $packet->seed;
+		$this->dimension = $packet->dimension;
+		$this->generator = $packet->generator;
+		$this->worldGamemode = $packet->worldGamemode;
+		$this->difficulty = $packet->difficulty;
+		$this->hasAchievementsDisabled = $packet->hasAchievementsDisabled;
+		$this->time = $packet->time;
+		$this->eduMode = $packet->eduEditionOffer;
+		$this->hasEduFeaturesEnabled = $packet->hasEduFeaturesEnabled;
+		$this->rainLevel = $packet->rainLevel;
+		$this->lightningLevel = $packet->lightningLevel;
+		$this->hasConfirmedPlatformLockedContent = $packet->hasConfirmedPlatformLockedContent;
+		$this->isMultiplayerGame = $packet->isMultiplayerGame;
+		$this->hasLANBroadcast = $packet->hasLANBroadcast;
+		$this->xboxLiveBroadcastMode = $packet->xboxLiveBroadcastMode;
+		$this->platformBroadcastMode = $packet->platformBroadcastMode;
+		$this->commandsEnabled = $packet->commandsEnabled;
+		$this->isTexturePacksRequired = $packet->isTexturePacksRequired;
+		$this->gameRules = $packet->gameRules;
+		$this->hasBonusChestEnabled = $packet->hasBonusChestEnabled;
+		$this->hasStartWithMapEnabled = $packet->hasStartWithMapEnabled;
+		$this->defaultPlayerPermission = $packet->defaultPlayerPermission;
+		$this->serverChunkTickRadius = $packet->serverChunkTickRadius;
+		$this->hasLockedBehaviorPack = $packet->hasLockedBehaviorPack;
+		$this->hasLockedResourcePack = $packet->hasLockedResourcePack;
+		$this->isFromLockedWorldTemplate = $packet->isFromLockedWorldTemplate;
+		$this->useMsaGamertagsOnly = $packet->useMsaGamertagsOnly;
+		$this->isFromWorldTemplate = $packet->isFromWorldTemplate;
+		$this->isWorldTemplateOptionLocked = $packet->isWorldTemplateOptionLocked;
+		$this->onlySpawnV1Villagers = $packet->onlySpawnV1Villagers;
+		$this->levelId = $packet->levelId;
+		$this->worldName = $packet->worldName;
+		$this->premiumWorldTemplateId = $packet->premiumWorldTemplateId;
+		$this->isTrial = $packet->isTrial;
+		$this->currentTick = $packet->currentTick;
+		$this->enchantmentSeed = $packet->enchantmentSeed;
+		$this->blockTable = $packet->blockTable;
+		return $this;
 	}
 }

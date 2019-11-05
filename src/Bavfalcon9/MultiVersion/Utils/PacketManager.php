@@ -121,7 +121,7 @@ class PacketManager {
             $success = $protocol->changePacket($pkN, $packet);
             
             if (!$success) {
-                $this->plugin->getLogger()->critical("[MULTIVERSION]: {$player->getName()} sent an unknown packet with id: {$nId}");
+                $this->plugin->getLogger()->critical("[MULTIVERSION]: Tried to send an unknown packet[{$nId}] to player: {$player->getName()}");
                 return;
             }
             array_push($this->queue[$player->getName()], $nId);
