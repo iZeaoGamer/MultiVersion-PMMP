@@ -22,6 +22,7 @@ class PlayerListPacket extends DataPacket{
 	public const NETWORK_ID = 0x3f;
 	public const TYPE_ADD = 0;
 	public const TYPE_REMOVE = 1;
+	public $customTranslation = true; // MUTLIVERSION
 	/** @var PlayerListEntry[] */
 	public $entries = [];
 	/** @var int */
@@ -81,5 +82,25 @@ class PlayerListPacket extends DataPacket{
 	}
 	public function handle(NetworkSession $session) : bool{
 		return $session->handlePlayerList($this);
+	}
+	public function translateCustomPacket($packet) {
+		$this->type = $packet->type;
+		foreach ($packet->entries as $entry) {
+				$cache = $entry->skin;
+				$skinData = $cache->getSkinData()->getData();
+				$capeData = $cache->getCapeData();
+				$skinId = $cache->getSkinId();
+				$geometryName = "Steve";
+				$geometryData = $cache->getGeometryData();
+				$capeData = $cache->getCapeData()->getData();
+				$entry->skin = new Skin(
+					$skinId,
+					$skinData,
+					$capeData,
+					$geometryName,
+					$geometryData
+				);
+		};
+		return $this;
 	}
 }

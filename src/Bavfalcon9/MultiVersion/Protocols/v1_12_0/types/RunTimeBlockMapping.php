@@ -35,8 +35,8 @@ final class RuntimeBlockMapping{
 		//NOOP
 	}
 	public static function init() : void{
-		$legacyIdMap = json_decode(file_get_contents(MULTIVERSION_v1_12_0 . "vanilla/block_id_map.json"), true);
-		$compressedTable = json_decode(file_get_contents(MULTIVERSION_v1_12_0 . "vanilla/block_states.json"), true);
+		$legacyIdMap = json_decode(file_get_contents(MULTIVERSION_v1_12_0 . "/block_id_map.json"), true);
+		$compressedTable = json_decode(file_get_contents(MULTIVERSION_v1_12_0 . "/block_states.json"), true);
 		$decompressed = [];
 		foreach($compressedTable as $prefix => $entries){
 			foreach($entries as $shortStringId => $states){

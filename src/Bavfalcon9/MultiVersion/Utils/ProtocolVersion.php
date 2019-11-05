@@ -62,9 +62,17 @@ class ProtocolVersion {
         if (!isset($this->protocolPackets[$name])) {
             return $oldPacket;
         }
+
         $pk = $this->dir . $name;
         $pk = new $pk;
         
+        if (!$oldPacket instanceof DataPacket) {
+            // I need to change this to be more dynamic
+            echo "[MULTIVERSION]: Packet change requested on non datapacket typing. {$oldPacket->getName()} | " . $oldPacket::NETWORK_ID . "\n";
+        }
+
+        if (isset($pk->customTranslation)) $pk = $pk->translateCustomPacket($oldPacket);
+
         $pk->setBuffer($oldPacket->buffer, $oldPacket->offset);
         $oldPacket = $pk;
         return $oldPacket;
