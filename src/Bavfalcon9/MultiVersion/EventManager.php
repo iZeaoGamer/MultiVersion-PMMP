@@ -31,7 +31,16 @@ class EventManager implements Listener {
 
         // 1.12 support.
         $newVersion = new ProtocolVersion(361, '1.12.0', false);
+        $newVersion->setProtocolPackets([
+            "LoginPacket" => 0x01,
+            "StartGamePacket" => 0x0b,
+            "RespawnPacket" => 0x2d,
+            "PlayerListPacket" => 0x3f,
+            "ExplodePacket" => 0x17,
+            "ResourcePackDataInfoPacket" => 0x52,
+        ]);
         $newVersion = $this->packetManager->registerProtocol($newVersion);
+        define('MULTIVERSION_v1_12_0', $this->plugin->getDataFolder().'v1_12_0');
         if (!$newVersion) MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.12.x");
     }
 

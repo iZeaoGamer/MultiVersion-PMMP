@@ -27,6 +27,11 @@ class Main extends PluginBase {
     public function onEnable() {
         $this->EventManager = new EventManager($this);
         $this->getServer()->getPluginManager()->registerEvents($this->EventManager, $this);
+        $this->saveResource('v1_12_0/block_id_map.json');
+        $this->saveResource('v1_12_0/block_states.json');
+        $this->saveResource('v1_12_0/entity_id_map.json');
+        $this->saveResource('v1_12_0/item_id_map.json');
+        $this->saveResource('v1_12_0/recipies.json');
     }
 
 }

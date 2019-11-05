@@ -13,10 +13,12 @@
 namespace Bavfalcon9\MultiVersion\Utils;
 
 use Bavfalcon9\MultiVersion\Main;
+use pocketmine\Player;
 use pocketmine\network\mcpe\PlayerNetworkSessionAdapter;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\LoginPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use pocketmine\network\mcpe\protocol\PlayStatusPacket;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 
@@ -49,33 +51,57 @@ class PacketManager {
         $packet = $event->getPacket();
         $player = $event->getPlayer();
         $nId = $packet::NETWORK_ID;
-
         if ($packet instanceof LoginPacket) {
             $protocol = $packet->protocol;
+            if (isset($this->queue[$packet->username]) and in_array($nId, $this->queue[$packet->username])) {
+                $packet->protocol = ProtocolInfo::CURRENT_PROTOCOL;
+                $packet->clientData['SkinGeometryData'] = $packet->clientData['SkinGeometry'];
+                $packet->clientData['SkinImageHeight'] = 64;
+                $packet->clientData['SkinImageWidth'] = 64;
+                array_splice($this->queue[$packet->username], array_search($nId, $this->queue[$packet->username]));
+                return;
+            }
             if ($protocol !== ProtocolInfo::CURRENT_PROTOCOL) {
                 /* check versions */
                 if (!isset($this->registered[$protocol])) {
                     // Protocol not supported.
-                    $this->plugin->getLogger()->info("[MULTIVERSION]: {$protocol->username} tried to join with protocol: {$protocol}");
+                    $this->plugin->getLogger()->critical("[MULTIVERSION]: {$packet->username} tried to join with protocol: {$protocol}");
                     $player->close('', '[MultiVersion]: Your game version is not yet supported here.');
                     $ev->setCancelled();
                     return;
                 } else {
+                    $this->plugin->getLogger()->info("[MULTIVERSION]: {$packet->username} joining with protocol: {$protocol}");
                     $this->oldplayers[$packet->username] = $protocol;
+                    $this->queue[$packet->username] = [];
+                    array_push($this->queue[$packet->username], $nId);
+                    $pc = $this->registered[$protocol];
+                    $pkN = $pc->getPacketName($nId);
+                    $pc->changePacket($pkN, $packet);
+                    $this->handleOldRecieved($packet, $player);
+                    $event->setCancelled();
+                    return;
                     // LOGIN HANDLE?
                 }
+            } else {
+                return;
             }
         }
 
         if (!isset($this->oldplayers[$player->getName()])) return;
-        if (!isset($this->queue[$player->getName()])) $this->queue[$player->getName()];
-
-        $protocol = $this->oldplayers[$player->getName()];
-        $protocol = $this->registered[$protocol];
-        $protocol->changePacket($protocol->getPacketName($nId), $packet);
-        $this->handleOldRecieved($packet, $player);
-        $event->setCancelled();
-        return;
+        if (!isset($this->queue[$player->getName()])) $this->queue[$player->getName()] = [];
+        if (isset($this->queue[$player->getName()]) and in_array($nId, $this->queue[$player->getName()])) {
+            array_splice($this->queue[$player->getName()], array_search($nId, $this->queue[$player->getName()]));
+            return;
+        } else {
+            array_push($this->queue[$player->getName()], $nId);
+            $protocol = $this->oldplayers[$player->getName()];
+            $protocol = $this->registered[$protocol];
+            $pkN = $protocol->getPacketName($nId);
+            $protocol->changePacket($pkN, $packet);
+            $this->handleOldRecieved($packet, $player);
+            $event->setCancelled();
+            return;
+        }
 
     }
 
@@ -83,26 +109,27 @@ class PacketManager {
         $packet = $event->getPacket();
         $player = $event->getPlayer();
         $nId = $packet::NETWORK_ID;
-        
-        if (!in_array($nId, $this->queue[$player->getName()])) {
-            $protocol = $this->oldplayers[$player->getName()];
-            $protocol = $this->registered[$protocol];
-            $success = $protocol->changePacket($protocol->getPacketName($nId), $packet);
-            
-            if (!$success) {
-                $this->plugin->getLogger()->info("[MULTIVERSION]: {$player->getName()} sent an unknown packet with id: {$nId}");
-                return;
-            }
-            
-            $player->sendDataPacket($packet);
-            array_push($this->queue[$player->getName()], $nId);
-            $event->setCancelled();
+        if (!isset($this->oldplayers[$player->getName()])) return;
+        if (isset($this->queue[$player->getName()]) and in_array($nId, $this->queue[$player->getName()])) {
+            array_splice($this->queue[$player->getName()], array_search($nId, $this->queue[$player->getName()]));
             return;
         } else {
-            unset($this->queue[$player->getName()][$nId]);
+            if (!isset($this->queue[$player->getName()])) $this->queue[$player->getName()] = [];
+            $protocol = $this->oldplayers[$player->getName()];
+            $protocol = $this->registered[$protocol];
+            $pkN = $protocol->getPacketName($nId);
+            $success = $protocol->changePacket($pkN, $packet);
+            
+            if (!$success) {
+                $this->plugin->getLogger()->critical("[MULTIVERSION]: {$player->getName()} sent an unknown packet with id: {$nId}");
+                return;
+            }
+            array_push($this->queue[$player->getName()], $nId);
+            $player->sendDataPacket($packet);
+            $event->setCancelled();
+            return;
         }
 
-        return;
     }
 
     private function handleOldRecieved(DataPacket $packet, Player $player) {

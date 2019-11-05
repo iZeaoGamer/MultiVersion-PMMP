@@ -25,9 +25,10 @@ class ProtocolVersion {
      * @return Void
      */
     public function __construct(Float $protocol, String $MCPE, Bool $restrict=false) {
+        $fixedMCPE = 'v'.implode('_', explode('.', $MCPE));
         $this->protocol = $protocol;
-        $this->dir = "Bavfalcon9\\MultiVersion\\Protocols\\".$MCPE."\\Packets\\";
-        $this->restricted = $restricted;
+        $this->dir = "Bavfalcon9\\MultiVersion\\Protocols\\".$fixedMCPE."\\Packets\\";
+        $this->restricted = $restrict;
         $this->minecraftVersion = $MCPE;
     }
 
@@ -47,16 +48,23 @@ class ProtocolVersion {
         return $this->minecraftVersion;
     }
 
-    public function changePacket(String &$name, DataPacket &$oldPacket): ?DataPacket {
+    public function getPacketName(Float $id): ?String {
+        foreach ($this->protocolPackets as $name=>$pid) {
+            if ($id == $pid) return $name;
+            else continue;
+        }
+
+        return '';
+    }
+
+    public function changePacket(String &$name, &$oldPacket) {
         if (!isset($this->protocolPackets[$name]) && $this->restricted === true) return null;
         if (!isset($this->protocolPackets[$name])) {
             return $oldPacket;
         }
-        $pk = $this->dir . $this->protocolPackets[$name];
+        $pk = $this->dir . $name;
         $pk = new $pk;
         
-        if(!$pk instanceof DataPacket) return false;
-
         $pk->setBuffer($oldPacket->buffer, $oldPacket->offset);
         $oldPacket = $pk;
         return $oldPacket;
