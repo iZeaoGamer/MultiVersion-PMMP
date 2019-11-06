@@ -71,7 +71,6 @@ class PacketManager {
                     return;
                 } else {
                     $this->plugin->getLogger()->info("[MULTIVERSION]: {$packet->username} joining with protocol: {$protocol}");
-                    $player->close('', '[MultiVersion]: v1.12 should be supported soon.');
                     $this->oldplayers[$packet->username] = $protocol;
                     $this->queue[$packet->username] = [];
                     array_push($this->queue[$packet->username], $nId);
