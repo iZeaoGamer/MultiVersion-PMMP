@@ -133,6 +133,7 @@ class PacketManager {
     }
 
     private function handleOldRecieved(DataPacket $packet, Player $player) {
+        /* This needs some updating to handle updated/outdated packets, right now its only for the servers interpretation. */
         $adapter = new PlayerNetworkSessionAdapter($this->plugin->getServer(), $player);
 		$adapter->handleDataPacket($packet);
     }
