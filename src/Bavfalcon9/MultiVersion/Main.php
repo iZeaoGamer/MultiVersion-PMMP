@@ -17,21 +17,41 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\permission\Permission;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\Player;
 use pocketmine\Server;
 use Bavfalcon9\MultiVersion\EventManager;
+use Bavfalcon9\MutliVersion\Utils\ProtocolVersion;
 
 class Main extends PluginBase {
     public $EventManager;
+    public $server_version;
 
     public function onEnable() {
+        $this->server_version = ProtocolInfo::MINECRAFT_VERSION_NETWORK;
+        if (!isset(ProtocolVersion::VERSIONS[$this->server_version])) {
+            $this->getLogger()->critical("Server version:". $this->server_version . "not supported by multiversion.");
+            $this->getServer()->getPluginManager()->disablePlugin($this);
+        }
         $this->EventManager = new EventManager($this);
         $this->getServer()->getPluginManager()->registerEvents($this->EventManager, $this);
-        $this->saveResource('v1_12_0/block_id_map.json');
-        $this->saveResource('v1_12_0/block_states.json');
-        $this->saveResource('v1_12_0/entity_id_map.json');
-        $this->saveResource('v1_12_0/item_id_map.json');
-        $this->saveResource('v1_12_0/recipies.json');
+        $this->saveAllResources();
+    }
+
+    private function saveAllResources() {
+        $resourcePath = $this->getFile() . "resources";
+        $versions = scandir($resourcePath);
+
+        foreach ($versions as $version) {
+            if ($version === '.' || $version === '..') continue;
+            else {
+                $files = scandir($resourcePath . "/" . $version);
+                foreach ($files as $file) {
+                    if ($file === '.' || $file === '..') continue;
+                    $this->saveResource($version . "/" . $file);
+                }
+            }
+        }
     }
 
 }

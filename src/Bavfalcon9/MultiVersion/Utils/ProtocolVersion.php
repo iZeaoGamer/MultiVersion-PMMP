@@ -15,6 +15,10 @@ namespace Bavfalcon9\MultiVersion\Utils;
 use pocketmine\network\mcpe\DataPacket;
 
 class ProtocolVersion {
+    public const VERSIONS = [
+        '1.12.0' => 361,
+        '1.13.0' => 388
+    ];
     private $protocol;
     private $protocolPackets = [];
     private $restricted = false;

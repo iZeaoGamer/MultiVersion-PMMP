@@ -28,20 +28,7 @@ class EventManager implements Listener {
     public function __construct(Main $pl) {
         $this->plugin = $pl;
         $this->packetManager = new PacketManager($pl);
-
-        // 1.12 support.
-        $newVersion = new ProtocolVersion(361, '1.12.0', false);
-        $newVersion->setProtocolPackets([
-            "LoginPacket" => 0x01,
-            "StartGamePacket" => 0x0b,
-            "RespawnPacket" => 0x2d,
-            "PlayerListPacket" => 0x3f,
-            "ExplodePacket" => 0x17,
-            "ResourcePackDataInfoPacket" => 0x52,
-        ]);
-        $newVersion = $this->packetManager->registerProtocol($newVersion);
-        define('MULTIVERSION_v1_12_0', $this->plugin->getDataFolder().'v1_12_0');
-        if (!$newVersion) MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.12.x");
+        $this->loadMultiVersion();
     }
 
     public function onRecieve(DataPacketReceiveEvent $event) {
@@ -52,6 +39,34 @@ class EventManager implements Listener {
     public function onSend(DataPacketSendEvent $event) {
         $this->packetManager->handlePacketSent($event);
         return;
+    }
+
+    private function loadMultiVersion() {
+        if ($this->plugin->server_version === '1.12.0') {
+            // 1.13 support on MCPE 1.12
+            $newVersion = new ProtocolVersion(ProtocolVersion::VERSIONS['1.13.0'], '1.12.0', false);
+            $newVersion->setProtocolPackets([
+                "LoginPacket" => 0x01,
+                "StartGamePacket" => 0x0b,
+                "RespawnPacket" => 0x2d,
+                "PlayerListPacket" => 0x3f,
+                "ExplodePacket" => 0x17,
+                "ResourcePackDataInfoPacket" => 0x52,
+            ]);
+            $newVersion = $this->packetManager->registerProtocol($newVersion);
+            define('MULTIVERSION_v1_12_0', $this->plugin->getDataFolder().'v1_12_0');
+            if (!$newVersion) MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.12.x");
+        }
+        if ($this->plugin->server_version === '1.13.0') {
+            // 1.12 support on MCPE 1.13
+            $newVersion = new ProtocolVersion(ProtocolVersion::VERSIONS['1.12.0'], '1.13.0', false);
+            $newVersion->setProtocolPackets([
+                /* TO DO */
+            ]);
+            $newVersion = $this->packetManager->registerProtocol($newVersion);
+            define('MULTIVERSION_v1_13_0', $this->plugin->getDataFolder().'v1_13_0');
+            if (!$newVersion) MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.13.x");
+        }
     }
 
 }
