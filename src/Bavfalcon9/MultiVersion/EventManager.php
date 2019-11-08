@@ -46,7 +46,8 @@ class EventManager implements Listener {
             // 1.13 support on MCPE 1.12
             $newVersion = new ProtocolVersion(ProtocolVersion::VERSIONS['1.13.0'], '1.13.0', false);
             $newVersion->setProtocolPackets([
-                "LoginPacket" => 0x01
+                "LoginPacket" => 0x01,
+                "StartGamePacket" => 0x0b
             ]);
             $newVersion = $this->packetManager->registerProtocol($newVersion);
             define('MULTIVERSION_v1_13_0', $this->plugin->getDataFolder().'v1_13_0');
