@@ -21,7 +21,7 @@ use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\Player;
 use pocketmine\Server;
 use Bavfalcon9\MultiVersion\EventManager;
-use Bavfalcon9\MutliVersion\Utils\ProtocolVersion;
+use Bavfalcon9\MultiVersion\Utils\ProtocolVersion;
 
 class Main extends PluginBase {
     public $EventManager;
