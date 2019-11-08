@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
@@ -12,6 +13,7 @@
  */
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
+
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\RespawnPacket as PMRespawn;
@@ -19,15 +21,19 @@ use pocketmine\network\mcpe\protocol\DataPacket;
 
 class RespawnPacket extends DataPacket{
 	public const NETWORK_ID = 0x2d;
+
     public $customTranslation = true;
 	/** @var Vector3 */
 	public $position;
+
 	protected function decodePayload(){
 		$this->position = $this->getVector3();
 	}
+
 	protected function encodePayload(){
 		$this->putVector3($this->position);
 	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleRespawn($this);
 	}

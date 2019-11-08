@@ -10,6 +10,9 @@
  * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
  *                                                            
  */
+
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Utils;
 
 interface API {

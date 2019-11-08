@@ -12,6 +12,8 @@
  *                                                            
  */
 
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Utils;
 
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -70,7 +72,9 @@ class ProtocolVersion {
     public function changePacket(String &$name, &$oldPacket, String $type='Sent') {
         if (!isset($this->protocolPackets[$name]) && $this->restricted === true) return null;
         if (!isset($this->protocolPackets[$name])) {
-            if (self::DEVELOPER === true) MainLogger::getLogger()->info("§c[MultiVersion] DEBUG:§e Packet §8[§f {$oldPacket->getName()} §8| §f".$oldPacket::NETWORK_ID."§8]§e requested a change but no change supported §a{$type}§e.");
+            if (self::DEVELOPER === true) {
+                MainLogger::getLogger()->info("§c[MultiVersion] DEBUG:§e Packet §8[§f {$oldPacket->getName()} §8| §f".$oldPacket::NETWORK_ID."§8]§e requested a change but no change supported §a{$type}§e.");
+            }
             return $oldPacket;
         }
 
@@ -99,6 +103,7 @@ class ProtocolVersion {
             $pk->translateLogin($packet);
             $pk->setBuffer($packet->buffer, $packet->offset);
             $packet = $pk;
+
             return $packet;
         }
     }

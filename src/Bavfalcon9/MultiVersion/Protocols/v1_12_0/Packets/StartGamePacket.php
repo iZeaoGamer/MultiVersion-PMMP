@@ -1,16 +1,18 @@
 <?php
 
 /**
- *    ___  ___      _ _   _ _   _               _             
- *    |  \/  |     | | | (_) | | |             (_)            
- *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
- *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \ 
+ *    ___  ___      _ _   _ _   _               _
+ *    |  \/  |     | | | (_) | | |             (_)
+ *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __
+ *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \
  *    | |  | | |_| | | |_| \ \_/ /  __/ |  \__ \ | (_) | | | |
  *    \_|  |_/\__,_|_|\__|_|\___/ \___|_|  |___/_|\___/|_| |_|
- * 
- * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
- *                                                            
+ *
+ * Copyright (C) 2019 Olybear9 (Bavfalcon9)
+ *
  */
+
+declare(strict_types=1);
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
 
@@ -179,12 +181,14 @@ class StartGamePacket extends DataPacket{
 			$unknown = $this->getSignedLShort();
 			$this->blockTable[$i] = ["name" => $id, "data" => $data, "legacy_id" => $unknown];
 		}
+
 		$this->itemTable = [];
 		for($i = 0, $count = $this->getUnsignedVarInt(); $i < $count; ++$i){
 			$id = $this->getString();
 			$legacyId = $this->getSignedLShort();
 			$this->itemTable[$id] = $legacyId;
 		}
+
 		$this->multiplayerCorrelationId = $this->getString();
 	}
 	protected function encodePayload(){
@@ -237,20 +241,25 @@ class StartGamePacket extends DataPacket{
 				//this is a really nasty hack, but it'll do for now
 				self::$blockTableCache = self::serializeBlockTable(RuntimeBlockMapping::getBedrockKnownStates());
 			}
+
 			$this->put(self::$blockTableCache);
 		}else{
 			$this->put(self::serializeBlockTable($this->blockTable));
 		}
+
 		if($this->itemTable === null){
 			if(self::$itemTableCache === null){
 				self::$itemTableCache = self::serializeItemTable(json_decode(file_get_contents(MULTIVERSION_v1_12_0. '/item_id_map.json'), true));
 			}
+
 			$this->put(self::$itemTableCache);
 		}else{
 			$this->put(self::serializeItemTable($this->itemTable));
 		}
+
 		$this->putString($this->multiplayerCorrelationId);
 	}
+
 	private static function serializeBlockTable(array $table) : string{
 		$stream = new NetworkBinaryStream();
 		$stream->putUnsignedVarInt(count($table));
@@ -259,8 +268,10 @@ class StartGamePacket extends DataPacket{
 			$stream->putLShort($v["data"]);
 			$stream->putLShort($v["legacy_id"]);
 		}
+
 		return $stream->getBuffer();
 	}
+
 	private static function serializeItemTable(array $table) : string{
 		$stream = new NetworkBinaryStream();
 		$stream->putUnsignedVarInt(count($table));
@@ -268,11 +279,14 @@ class StartGamePacket extends DataPacket{
 			$stream->putString($name);
 			$stream->putLShort($legacyId);
 		}
+
 		return $stream->getBuffer();
 	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleStartGame($this);
 	}
+
 	public function translateCustomPacket($packet) {
 		$this->spawnX = $packet->spawnX;
 		$this->spawnY = $packet->spawnY;
@@ -321,6 +335,7 @@ class StartGamePacket extends DataPacket{
 		$this->currentTick = $packet->currentTick;
 		$this->enchantmentSeed = $packet->enchantmentSeed;
 		$this->blockTable = $packet->blockTable;
+
 		return $this;
 	}
 }

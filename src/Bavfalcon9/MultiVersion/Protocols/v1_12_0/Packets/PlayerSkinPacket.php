@@ -1,5 +1,19 @@
 <?php
 
+/**
+ *    ___  ___      _ _   _ _   _               _
+ *    |  \/  |     | | | (_) | | |             (_)
+ *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __
+ *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \
+ *    | |  | | |_| | | |_| \ \_/ /  __/ |  \__ \ | (_) | | | |
+ *    \_|  |_/\__,_|_|\__|_|\___/ \___|_|  |___/_|\___/|_| |_|
+ *
+ * Copyright (C) 2019 Olybear9 (Bavfalcon9)
+ *
+ */
+
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
 
 use Bavfalcon9\MultiVersion\Protocols\v1_12_0\Entity\Skin;
@@ -34,6 +48,7 @@ class PlayerSkinPacket extends DataPacket{
         $this->skin = new Skin($skinId, $skinData, $capeData, $geometryModel, $geometryData);
         $this->premiumSkin = $this->getBool();
     }
+
     protected function encodePayload(){
         $this->putUUID($this->uuid);
         $this->putString($this->skin->getSkinId());
@@ -45,6 +60,7 @@ class PlayerSkinPacket extends DataPacket{
         $this->putString($this->skin->getGeometryData());
         $this->putBool($this->premiumSkin);
     }
+
     public function handle(NetworkSession $session) : bool{
         return $session->handlePlayerSkin($this);
     }
@@ -54,8 +70,8 @@ class PlayerSkinPacket extends DataPacket{
         $this->uuid = $packet->uuid;
         $this->oldSkinName = "";
         $this->newSkinName = "";
-        $skinData = $skin->getSkinData();
-        $capeData = $skin->getCapeData();
+        $skinData = $skin->getSkinData()->getData();
+        $capeData = $skin->getCapeData()->getData();
         $skinId = $skin->getSkinId();
         $geometryName = "Steve";
         $geometryData = $skin->getGeometryData();

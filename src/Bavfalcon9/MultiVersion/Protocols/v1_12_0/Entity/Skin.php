@@ -12,6 +12,8 @@
  *
  */
 
+declare(stricts_types=1);
+
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Entity;
 
 use Ahc\Json\Comment as CommentedJsonDecoder;
@@ -19,12 +21,15 @@ use function implode;
 use function in_array;
 use function json_encode;
 use function strlen;
+
 class Skin{
+
 	public const ACCEPTED_SKIN_SIZES = [
 		64 * 32 * 4,
 		64 * 64 * 4,
 		128 * 128 * 4
 	];
+
 	/** @var string */
 	private $skinId;
 	/** @var string */
@@ -50,6 +55,7 @@ class Skin{
 		$this->geometryName = $geometryName;
 		$this->geometryData = $geometryData;
 	}
+
 	/**
 	 * @deprecated
 	 * @return bool
@@ -62,6 +68,7 @@ class Skin{
 			return false;
 		}
 	}
+
 	/**
 	 * @throws \InvalidArgumentException
 	 */
@@ -69,45 +76,54 @@ class Skin{
 		if($this->skinId === ""){
 			throw new \InvalidArgumentException("Skin ID must not be empty");
 		}
+
 		$len = strlen($this->skinData);
 		if(!in_array($len, self::ACCEPTED_SKIN_SIZES, true)){
 			throw new \InvalidArgumentException("Invalid skin data size $len bytes (allowed sizes: " . implode(", ", self::ACCEPTED_SKIN_SIZES) . ")");
 		}
+
 		if($this->capeData !== "" and strlen($this->capeData) !== 8192){
 			throw new \InvalidArgumentException("Invalid cape data size " . strlen($this->capeData) . " bytes (must be exactly 8192 bytes)");
 		}
+
 		//TODO: validate geometry
 	}
+
 	/**
 	 * @return string
 	 */
 	public function getSkinId() : string{
 		return $this->skinId;
 	}
+
 	/**
 	 * @return string
 	 */
 	public function getSkinData() : string{
 		return $this->skinData;
 	}
+
 	/**
 	 * @return string
 	 */
 	public function getCapeData() : string{
-		return $this->capeData;
+	    return $this->capeData;
 	}
+
 	/**
 	 * @return string
 	 */
 	public function getGeometryName() : string{
 		return $this->geometryName;
 	}
+
 	/**
 	 * @return string
 	 */
 	public function getGeometryData() : string{
 		return $this->geometryData;
 	}
+
 	/**
 	 * Hack to cut down on network overhead due to skins, by un-pretty-printing geometry JSON.
 	 *

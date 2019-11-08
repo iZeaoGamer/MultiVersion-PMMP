@@ -1,18 +1,21 @@
 <?php
-/***
- *    ___  ___      _ _   _ _   _               _             
- *    |  \/  |     | | | (_) | | |             (_)            
- *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
- *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \ 
+
+/**
+ *    ___  ___      _ _   _ _   _               _
+ *    |  \/  |     | | | (_) | | |             (_)
+ *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __
+ *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \
  *    | |  | | |_| | | |_| \ \_/ /  __/ |  \__ \ | (_) | | | |
  *    \_|  |_/\__,_|_|\__|_|\___/ \___|_|  |___/_|\___/|_| |_|
- * 
- * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
- *                                                            
+ *
+ * Copyright (C) 2019 Olybear9 (Bavfalcon9)
+ *
  */
+
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
-use pocketmine\network\mcpe\NetworkSession;
-use pocketmine\network\mcpe\protocol\DataPacket;
+
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\Skin;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SkinAnimation;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SerializedImage;
@@ -20,19 +23,24 @@ use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\PlayerListPacket as PMListPacket;
 use function count;
+
 class PlayerListPacket extends PMListPacket{
 	public const NETWORK_ID = ProtocolInfo::PLAYER_LIST_PACKET;
 	public const TYPE_ADD = 0;
 	public const TYPE_REMOVE = 1;
+
 	/** @var PlayerListEntry[] */
 	public $entries = [];
 	/** @var int */
 	public $type;
+
 	public $customTranslation = true; // MUTLIVERSION
+
 	public function clean(){
 		$this->entries = [];
 		return parent::clean();
 	}
+
 	protected function decodePayload(){
 		$this->type = $this->getByte();
 		$count = $this->getUnsignedVarInt();
@@ -51,6 +59,7 @@ class PlayerListPacket extends PMListPacket{
 			}else{
 				$entry->uuid = $this->getUUID();
 			}
+
 			$this->entries[$i] = $entry;
 		}
     }
@@ -76,7 +85,8 @@ class PlayerListPacket extends PMListPacket{
 			}
 		}
 	}
-    private function getSkin() {
+
+    private function getSkin() : Skin{
 		$skinId = $this->getString();
 		$skinResourcePatch = $this->getString();
 		$skinData = $this->getImage();
@@ -85,6 +95,7 @@ class PlayerListPacket extends PMListPacket{
 		for($i = 0, $count = $animationCount; $i < $count; ++$i){
 			$animations[] = new SkinAnimation($this->getImage(), $this->getLInt(), $this->getLFloat());
 		}
+
 		$capeData = $this->getImage();
 		$geometryData = $this->getString();
 		$animationData = $this->getString();
@@ -93,9 +104,11 @@ class PlayerListPacket extends PMListPacket{
 		$capeOnClassic = $this->getBool();
 		$capeId = $this->getString();
 		$fullSkinId = $this->getString();
+
 		return new Skin($skinId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $animationData, $premium, $persona, $capeOnClassic, $capeId);
     }
-    private function putSkin($skin) {
+
+    private function putSkin(Skin $skin) : void{
         $this->putString($skin->getSkinId());
 		$this->putString($skin->getSkinResourcePatch());
 		$this->putImage($skin->getSkinData());
@@ -105,6 +118,7 @@ class PlayerListPacket extends PMListPacket{
 			$this->putLInt($animation->getType());
 			$this->putLFloat($animation->getFrames());
 		}
+
 		$this->putImage($skin->getCapeData());
 		$this->putString($skin->getGeometryData());
 		$this->putString($skin->getAnimationData());
@@ -114,22 +128,27 @@ class PlayerListPacket extends PMListPacket{
 		$this->putString($skin->getCapeId());
 		$this->putString($skin->getFullSkinId());
 	}
-	private function putImage(SerializedImage $image) : void{
+
+	public function putImage(SerializedImage $image) : void{
 		$this->putLInt($image->getWidth());
 		$this->putLInt($image->getHeight());
 		$this->putString($image->getData());
 	}
-	private function getImage() : SerializedImage{
+
+	public function getImage() : SerializedImage{
 		$width = $this->getLInt();
 		$height = $this->getLInt();
 		$data = $this->getString();
+
 		return new SerializedImage($width, $height, $data);
 	}
+
 	public function translateCustomPacket($packet) {
 		$this->type = $packet->type;
 		foreach ($packet->entries as $entry) {
 			$entry->skin = Skin::null();
 		};
+
 		return $this;
 	}
 }

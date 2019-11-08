@@ -1,5 +1,5 @@
 <?php
-/***
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -12,8 +12,9 @@
  */
 
 declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
-#include <rules/DataPacket.h>
+
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SerializedImage;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\Skin;
 use pocketmine\network\mcpe\NetworkSession;
@@ -23,22 +24,27 @@ use pocketmine\network\mcpe\protocol\ProtocolInfo;
 
 class PlayerSkinPacket extends DataPacket{
 	public const NETWORK_ID = ProtocolInfo::PLAYER_SKIN_PACKET;
+
 	/** @var UUID */
 	public $uuid;
 	/** @var Skin */
 	public $skin;
+
 	protected function decodePayload(){
 		$this->uuid = $this->getUUID();
 		$this->skin = $this->getSkin();
 	}
+
 	protected function encodePayload(){
 		$this->putUUID($this->uuid);
 		$this->putSkin($this->skin);
 	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handlePlayerSkin($this);
     }
-    private function getSkin() {
+
+    private function getSkin() : Skin{
 		$skinId = $this->getString();
 		$skinResourcePatch = $this->getString();
 		$skinData = $this->getImage();
@@ -47,6 +53,7 @@ class PlayerSkinPacket extends DataPacket{
 		for($i = 0, $count = $animationCount; $i < $count; ++$i){
 			$animations[] = new SkinAnimation($this->getImage(), $this->getLInt(), $this->getLFloat());
 		}
+
 		$capeData = $this->getImage();
 		$geometryData = $this->getString();
 		$animationData = $this->getString();
@@ -55,8 +62,10 @@ class PlayerSkinPacket extends DataPacket{
 		$capeOnClassic = $this->getBool();
 		$capeId = $this->getString();
 		$fullSkinId = $this->getString();
+
 		return new Skin($skinId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $animationData, $premium, $persona, $capeOnClassic, $capeId);
     }
+
     private function putSkin($skin) {
         $this->putString($skin->getSkinId());
 		$this->putString($skin->getSkinResourcePatch());
@@ -67,6 +76,7 @@ class PlayerSkinPacket extends DataPacket{
 			$this->putLInt($animation->getType());
 			$this->putLFloat($animation->getFrames());
 		}
+
 		$this->putImage($skin->getCapeData());
 		$this->putString($skin->getGeometryData());
 		$this->putString($skin->getAnimationData());
@@ -76,11 +86,13 @@ class PlayerSkinPacket extends DataPacket{
 		$this->putString($skin->getCapeId());
 		$this->putString($skin->getFullSkinId());
 	}
+
 	private function putImage(SerializedImage $image) : void{
 		$this->putLInt($image->getWidth());
 		$this->putLInt($image->getHeight());
 		$this->putString($image->getData());
 	}
+
 	private function getImage() : SerializedImage{
 		$width = $this->getLInt();
 		$height = $this->getLInt();

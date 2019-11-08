@@ -1,28 +1,25 @@
 <?php
-/*
+
+/**
+ *    ___  ___      _ _   _ _   _               _
+ *    |  \/  |     | | | (_) | | |             (_)
+ *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __
+ *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \
+ *    | |  | | |_| | | |_| \ \_/ /  __/ |  \__ \ | (_) | | | |
+ *    \_|  |_/\__,_|_|\__|_|\___/ \___|_|  |___/_|\___/|_| |_|
  *
- *  ____            _        _   __  __ _                  __  __ ____
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
- * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
+ * Copyright (C) 2019 Olybear9 (Bavfalcon9)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * @author PocketMine Team
- * @link http://www.pocketmine.net/
- *
- *
-*/
+ */
+
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity;
 
 use Ahc\Json\Comment as CommentedJsonDecoder;
 use InvalidArgumentException;
-
 use function json_encode;
+
 class Skin{
 	public const ACCEPTED_SKIN_SIZES = [
 		64 * 32 * 4,
@@ -51,6 +48,7 @@ class Skin{
 	private $capeOnClassic;
 	/** @var ?string */
 	private $capeId;
+
 	public function __construct(string $skinId, string $skinResourcePatch, SerializedImage $skinData, array $animations = [], SerializedImage $capeData = null, string $geometryData = "", string $animationData = "", bool $premium = false, bool $persona = false, $capeOnClassic = false, string $capeId = null){
 		$this->skinId = $skinId;
 		$this->skinResourcePatch = $skinResourcePatch;
@@ -65,51 +63,61 @@ class Skin{
 		$this->capeId = $capeId;
 		$this->debloatGeometryData();
 	}
+
 	public static function null() : Skin {
 		return new Skin("null", "", SerializedImage::null(), [], SerializedImage::null());
 	}
+
 	public static function convertLegacyGeometryName(string $geometryName) : string{
 		return '{"geometry" : {"default" : "' . $geometryName . '"}}';
 	}
+
 	/**
 	 * @return string
 	 */
 	public function getSkinResourcePatch() : string{
 		return $this->skinResourcePatch;
 	}
+
 	/**
 	 * @return SkinAnimation[]
 	 */
 	public function getAnimations() : array{
 		return $this->animations;
 	}
+
 	/**
 	 * @return string
 	 */
 	public function getAnimationData() : string{
 		return $this->animationData;
 	}
+
 	/**
 	 * @return bool
 	 */
 	public function isPremium() : bool{
 		return $this->premium;
 	}
+
 	/**
 	 * @return bool
 	 */
 	public function isPersona() : bool{
 		return $this->persona;
 	}
+
 	/**
 	 * @return bool
 	 */
 	public function isCapeOnClassic() : bool{
 		return $this->capeOnClassic;
 	}
+
 	public function getCapeId() : string{
 		return $this->capeId ?? "";
 	}
+
 	/**
 	 * @deprecated
 	 * @return bool
@@ -122,6 +130,7 @@ class Skin{
 			return false;
 		}
 	}
+
 	/**
 	 * @throws InvalidArgumentException
 	 */
@@ -131,18 +140,21 @@ class Skin{
 		}
 		//TODO: validate geometry
 	}
+
 	/**
 	 * @return string
 	 */
 	public function getSkinId() : string{
 		return $this->skinId;
 	}
+
 	/**
 	 * @return SerializedImage
 	 */
 	public function getSkinData() : SerializedImage{
 		return $this->skinData;
 	}
+
 	/**
 	 * @return SerializedImage
 	 */
@@ -152,12 +164,14 @@ class Skin{
 		}
 		return $this->capeData;
 	}
+
 	/**
 	 * @return string
 	 */
 	public function getGeometryData() : string{
 		return $this->geometryData;
 	}
+
 	/**
 	 * Hack to cut down on network overhead due to skins, by un-pretty-printing geometry JSON.
 	 *
@@ -170,6 +184,7 @@ class Skin{
 			$this->geometryData = (string) json_encode((new CommentedJsonDecoder())->decode($this->geometryData));
 		}
 	}
+
 	public function getFullSkinId() : string{
 		return $this->skinId . "_" . $this->getCapeId();
 	}

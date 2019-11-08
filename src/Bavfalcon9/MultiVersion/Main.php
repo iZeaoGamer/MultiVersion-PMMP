@@ -12,6 +12,8 @@
  *                                                            
  */
 
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion;
 
 use pocketmine\plugin\PluginBase;
@@ -28,6 +30,7 @@ class Main extends PluginBase {
             $this->getLogger()->critical("Server version:". $this->server_version . "not supported by multiversion.");
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
+
         $this->EventManager = new EventManager($this);
         $this->getServer()->getPluginManager()->registerEvents($this->EventManager, $this);
         $this->saveAllResources();
@@ -38,11 +41,14 @@ class Main extends PluginBase {
         $versions = scandir($resourcePath);
 
         foreach ($versions as $version) {
-            if ($version === '.' || $version === '..') continue;
-            else {
+            if ($version === '.' || $version === '..') {
+                continue;
+            } else {
                 $files = scandir($resourcePath . "/" . $version);
                 foreach ($files as $file) {
-                    if ($file === '.' || $file === '..') continue;
+                    if ($file === '.' || $file === '..') {
+                        continue;
+                    }
                     $this->saveResource($version . "/" . $file);
                 }
             }

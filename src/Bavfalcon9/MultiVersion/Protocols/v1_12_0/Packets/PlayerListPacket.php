@@ -1,5 +1,6 @@
 <?php
-/***
+
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -11,6 +12,8 @@
  *                                                            
  */
 
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
 
 use pocketmine\network\mcpe\NetworkSession;
@@ -18,21 +21,25 @@ use pocketmine\network\mcpe\protocol\DataPacket;
 use Bavfalcon9\MultiVersion\Protocols\v1_12_0\Entity\Skin;
 use pocketmine\network\mcpe\protocol\PlayerListPacket as PMPlayerList;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
-
 use function count;
+
 class PlayerListPacket extends DataPacket{
 	public const NETWORK_ID = 0x3f;
 	public const TYPE_ADD = 0;
 	public const TYPE_REMOVE = 1;
+
 	public $customTranslation = true; // MULTIVERSION
+
 	/** @var PlayerListEntry[] */
 	public $entries = [];
 	/** @var int */
 	public $type;
+
 	public function clean(){
 		$this->entries = [];
 		return parent::clean();
 	}
+
 	protected function decodePayload(){
 		$this->type = $this->getByte();
 		$count = $this->getUnsignedVarInt();
@@ -59,9 +66,11 @@ class PlayerListPacket extends DataPacket{
 			}else{
 				$entry->uuid = $this->getUUID();
 			}
+
 			$this->entries[$i] = $entry;
 		}
 	}
+
 	protected function encodePayload(){
 		$this->putByte($this->type);
 		$this->putUnsignedVarInt(count($this->entries));
@@ -71,9 +80,9 @@ class PlayerListPacket extends DataPacket{
 				$this->putEntityUniqueId($entry->entityUniqueId);
 				$this->putString($entry->username);
 				$this->putString($entry->skin->getSkinId());
-				$this->putString($entry->skin->getSkinData());
-				$this->putString($entry->skin->getCapeData());
-				$this->putString($entry->skin->getGeometryName());
+				$this->putString($entry->skin->getSkinData()->getData());
+				$this->putString($entry->skin->getCapeData()->getData());
+				$this->putString("");
 				$this->putString($entry->skin->getGeometryData());
 				$this->putString($entry->xboxUserId);
 				$this->putString($entry->platformChatId);
@@ -82,15 +91,17 @@ class PlayerListPacket extends DataPacket{
 			}
 		}
 	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handlePlayerList($this);
 	}
+
 	public function translateCustomPacket(PMPlayerList $packet) {
 		$this->type = $packet->type;
 		foreach ($packet->entries as $entry) {
 				$cache = $entry->skin;
-				$skinData = $cache->getSkinData();
-				$capeData = $cache->getCapeData();
+				$skinData = $cache->getSkinData()->getData();
+				$capeData = $cache->getCapeData()->getData();
 				$skinId = $cache->getSkinId();
 				$geometryName = "Steve";
 				$geometryData = $cache->getGeometryData();
@@ -102,6 +113,7 @@ class PlayerListPacket extends DataPacket{
 					$geometryData
 				);
 		};
+
 		return $this;
 	}
 }

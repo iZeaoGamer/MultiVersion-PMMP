@@ -1,5 +1,6 @@
 <?php
-/***
+
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -11,15 +12,15 @@
  *                                                            
  */
 
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
+
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\Skin;
-use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SerializedImage;
-use pocketmine\network\mcpe\NetworkSession;
-use pocketmine\network\mcpe\protocol\DataPacket;
-use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\utils\UUID;
 
 class PlayerListEntry{
+
 	/** @var UUID */
 	public $uuid;
 	/** @var int */
@@ -38,11 +39,13 @@ class PlayerListEntry{
 	public $isTeacher = false;
 	/** @var bool */
     public $isHost = false;
+
 	public static function createRemovalEntry(UUID $uuid) : PlayerListEntry{
 		$entry = new PlayerListEntry();
 		$entry->uuid = $uuid;
 		return $entry;
 	}
+
 	public static function createAdditionEntry(UUID $uuid, int $entityUniqueId, string $username, Skin $skin, string $xboxUserId = "", string $platformChatId = "") : PlayerListEntry{
 		$entry = new PlayerListEntry();
 		$entry->uuid = $uuid;
@@ -51,6 +54,7 @@ class PlayerListEntry{
 		$entry->skin = $skin;
 		$entry->xboxUserId = $xboxUserId;
 		$entry->platformChatId = $platformChatId;
+
 		return $entry;
     }
 }

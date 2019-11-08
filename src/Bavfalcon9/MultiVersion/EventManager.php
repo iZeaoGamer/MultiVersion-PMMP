@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
@@ -10,6 +11,9 @@
  * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
  *                                                            
  */
+
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion;
 
 use Bavfalcon9\MultiVersion\Utils\PacketManager;

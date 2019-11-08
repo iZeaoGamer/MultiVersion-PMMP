@@ -11,7 +11,10 @@
  *                                                            
  */
 
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
+
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\types\RuntimeBlockMapping;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -23,18 +26,20 @@ use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\NetworkBinaryStream;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
-
 use function count;
 use function file_get_contents;
 use function json_decode;
 
 class StartGamePacket extends DataPacket{
     public const NETWORK_ID = ProtocolInfo::START_GAME_PACKET;
+
     public $customTranslation = true;
+
 	/** @var string|null */
 	private static $blockTableCache = null;
 	/** @var string|null */
 	private static $itemTableCache = null;
+
 	/** @var int */
 	public $entityUniqueId;
 	/** @var int */
@@ -137,6 +142,7 @@ class StartGamePacket extends DataPacket{
 	public $blockTable = null;
 	/** @var array|null string (name) => int16 (legacyID) */
 	public $itemTable = null;
+
 	protected function decodePayload(){
 		$this->entityUniqueId = $this->getEntityUniqueId();
 		$this->entityRuntimeId = $this->getEntityRuntimeId();
@@ -191,14 +197,17 @@ class StartGamePacket extends DataPacket{
 			$unknown = $this->getSignedLShort();
 			$this->blockTable[$i] = ["name" => $id, "data" => $data, "legacy_id" => $unknown];
 		}
+
 		$this->itemTable = [];
 		for($i = 0, $count = $this->getUnsignedVarInt(); $i < $count; ++$i){
 			$id = $this->getString();
 			$legacyId = $this->getSignedLShort();
 			$this->itemTable[$id] = $legacyId;
 		}
+
 		$this->multiplayerCorrelationId = $this->getString();
 	}
+
 	protected function encodePayload(){
 		$this->putEntityUniqueId($this->entityUniqueId);
 		$this->putEntityRuntimeId($this->entityRuntimeId);
@@ -251,20 +260,25 @@ class StartGamePacket extends DataPacket{
 				//this is a really nasty hack, but it'll do for now
 				self::$blockTableCache = self::serializeBlockTable(RuntimeBlockMapping::getBedrockKnownStates());
 			}
+
 			$this->put(self::$blockTableCache);
 		}else{
 			$this->put(self::serializeBlockTable($this->blockTable));
 		}
+
 		if($this->itemTable === null){
 			if(self::$itemTableCache === null){
 				self::$itemTableCache = self::serializeItemTable(json_decode(file_get_contents(MULTIVERSION_v1_13_0 . '/item_id_map.json'), true));
 			}
+
 			$this->put(self::$itemTableCache);
 		}else{
 			$this->put(self::serializeItemTable($this->itemTable));
 		}
+
 		$this->putString($this->multiplayerCorrelationId);
 	}
+
 	private static function serializeBlockTable(array $table) : string{
 		$states = new ListTag();
 		foreach($table as $v){
@@ -276,9 +290,11 @@ class StartGamePacket extends DataPacket{
 			$state->setShort("id", $v["legacy_id"]);
 			$states->push($state);
 		}
+
 		($stream = new NetworkLittleEndianNBTStream())->writeTag($states);
 		return $stream->buffer;
 	}
+
 	private static function serializeItemTable(array $table) : string{
 		$stream = new NetworkBinaryStream();
 		$stream->putUnsignedVarInt(count($table));
@@ -286,11 +302,14 @@ class StartGamePacket extends DataPacket{
 			$stream->putString($name);
 			$stream->putLShort($legacyId);
 		}
+
 		return $stream->getBuffer();
 	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleStartGame($this);
     }
+
 	public function translateCustomPacket($packet) {
 		$this->spawnX = $packet->spawnX;
 		$this->spawnY = $packet->spawnY;
@@ -339,6 +358,7 @@ class StartGamePacket extends DataPacket{
 		$this->currentTick = $packet->currentTick;
 		$this->enchantmentSeed = $packet->enchantmentSeed;
 		$this->blockTable = $packet->blockTable;
+
 		return $this;
 	}
 }

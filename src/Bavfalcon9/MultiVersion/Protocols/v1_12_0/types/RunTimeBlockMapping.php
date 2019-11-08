@@ -1,18 +1,20 @@
 <?php
+
 /**
- *    ___  ___      _ _   _ _   _               _             
- *    |  \/  |     | | | (_) | | |             (_)            
- *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
- *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \ 
+ *    ___  ___      _ _   _ _   _               _
+ *    |  \/  |     | | | (_) | | |             (_)
+ *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __
+ *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \
  *    | |  | | |_| | | |_| \ \_/ /  __/ |  \__ \ | (_) | | | |
  *    \_|  |_/\__,_|_|\__|_|\___/ \___|_|  |___/_|\___/|_| |_|
- * 
- * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
- *                                                            
+ *
+ * Copyright (C) 2019 Olybear9 (Bavfalcon9)
+ *
  */
 
-namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\types;
+declare(strict_types=1);
 
+namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\types;
 
 use pocketmine\block\BlockIds;
 use function file_get_contents;
@@ -21,19 +23,23 @@ use function json_decode;
 use function mt_rand;
 use function mt_srand;
 use function shuffle;
+
 /**
  * @internal
  */
 final class RuntimeBlockMapping{
+
 	/** @var int[] */
 	private static $legacyToRuntimeMap = [];
 	/** @var int[] */
 	private static $runtimeToLegacyMap = [];
 	/** @var mixed[] */
 	private static $bedrockKnownStates;
+
 	private function __construct(){
 		//NOOP
 	}
+
 	public static function init() : void{
 		$legacyIdMap = json_decode(file_get_contents(MULTIVERSION_v1_12_0 . "/block_id_map.json"), true);
 		$compressedTable = json_decode(file_get_contents(MULTIVERSION_v1_12_0 . "/block_states.json"), true);
@@ -60,6 +66,7 @@ final class RuntimeBlockMapping{
 			self::registerMapping($k, $obj["legacy_id"], $obj["data"]);
 		}
 	}
+
 	/**
 	 * Randomizes the order of the runtimeID table to prevent plugins relying on them.
 	 * Plugins shouldn't use this stuff anyway, but plugin devs have an irritating habit of ignoring what they
@@ -91,6 +98,7 @@ final class RuntimeBlockMapping{
 		 */
 		return self::$legacyToRuntimeMap[($id << 4) | $meta] ?? self::$legacyToRuntimeMap[$id << 4] ?? self::$legacyToRuntimeMap[BlockIds::INFO_UPDATE << 4];
 	}
+
 	/**
 	 * @param int $runtimeId
 	 *
@@ -100,10 +108,12 @@ final class RuntimeBlockMapping{
 		$v = self::$runtimeToLegacyMap[$runtimeId];
 		return [$v >> 4, $v & 0xf];
 	}
+
 	private static function registerMapping(int $staticRuntimeId, int $legacyId, int $legacyMeta) : void{
 		self::$legacyToRuntimeMap[($legacyId << 4) | $legacyMeta] = $staticRuntimeId;
 		self::$runtimeToLegacyMap[$staticRuntimeId] = ($legacyId << 4) | $legacyMeta;
 	}
+
 	/**
 	 * @return array
 	 */

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
@@ -19,11 +20,14 @@ use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\utils\BinaryStream;
 use pocketmine\utils\MainLogger;
 use pocketmine\utils\Utils;
-use pocketmine\network\mcpe\protocol\LoginPacket as LP;
+use pocketmine\network\mcpe\protocol\LoginPacket as PMLogin;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
-class LoginPacket extends LP{
+
+class LoginPacket extends PMLogin{
+
 	public const NETWORK_ID = 0x01;
 	public const EDITION_POCKET = 0;
+
 	/** @var string */
 	public $username;
 	/** @var int */
@@ -52,20 +56,23 @@ class LoginPacket extends LP{
 	 *
 	 * @var bool
 	 */
-	public $skipVerification = \false;
+	public $skipVerification = false;
+
 	public function canBeSentBeforeLogin() : bool{
-		return \true;
+		return true;
 	}
+
 	public function mayHaveUnreadBytes() : bool{
-		return $this->protocol !== \null and $this->protocol !== ProtocolInfo::CURRENT_PROTOCOL;
+		return $this->protocol !== null and $this->protocol !== ProtocolInfo::CURRENT_PROTOCOL;
 	}
+
 	protected function decodePayload(){
-		$this->protocol = ((\unpack("N", $this->get(4))[1] << 32 >> 32));
+		$this->protocol = ((unpack("N", $this->get(4))[1] << 32 >> 32));
 		$this->protocol = ProtocolInfo::CURRENT_PROTOCOL; // This is a 1.12 hack?
 		if($this->protocol !== ProtocolInfo::CURRENT_PROTOCOL){
 			if($this->protocol > 0xffff){ //guess MCPE <= 1.1
 				$this->offset -= 6;
-				$this->protocol = ((\unpack("N", $this->get(4))[1] << 32 >> 32));
+				$this->protocol = ((unpack("N", $this->get(4))[1] << 32 >> 32));
 			}
 		}
 		try{
@@ -75,15 +82,16 @@ class LoginPacket extends LP{
 				throw $e;
 			}
 			$logger = MainLogger::getLogger();
-			$logger->debug(\get_class($e) . " was thrown while decoding connection request in login (protocol version " . ($this->protocol ?? "unknown") . "): " . $e->getMessage());
-			foreach(\pocketmine\getTrace(0, $e->getTrace()) as $line){
+			$logger->debug(get_class($e) . " was thrown while decoding connection request in login (protocol version " . ($this->protocol ?? "unknown") . "): " . $e->getMessage());
+			foreach(Utils::printableTrace($e->getTrace()) as $line){
 				$logger->debug($line);
 			}
 		}
 	}
+
 	protected function decodeConnectionRequest() : void{
 		$buffer = new BinaryStream($this->getString());
-		$this->chainData = \json_decode($buffer->get($buffer->getLInt()), \true);
+		$this->chainData = json_decode($buffer->get($buffer->getLInt()), \true);
 		foreach($this->chainData["chain"] as $chain){
 			$webtoken = Utils::decodeJWT($chain);
 			if(isset($webtoken["extraData"])){
@@ -103,13 +111,15 @@ class LoginPacket extends LP{
 		}
 		$this->clientDataJwt = $buffer->get($buffer->getLInt());
 		$this->clientData = Utils::decodeJWT($this->clientDataJwt);
-		$this->clientId = $this->clientData["ClientRandomId"] ?? \null;
-		$this->serverAddress = $this->clientData["ServerAddress"] ?? \null;
-		$this->locale = $this->clientData["LanguageCode"] ?? \null;
+		$this->clientId = $this->clientData["ClientRandomId"] ?? null;
+		$this->serverAddress = $this->clientData["ServerAddress"] ?? null;
+		$this->locale = $this->clientData["LanguageCode"] ?? null;
 	}
+
 	protected function encodePayload(){
 		//TODO
 	}
+
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleLogin($this);
 	}
