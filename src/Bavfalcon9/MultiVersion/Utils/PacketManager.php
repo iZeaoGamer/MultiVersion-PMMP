@@ -67,7 +67,7 @@ class PacketManager {
                     // Protocol not supported.
                     $this->plugin->getLogger()->critical("[MULTIVERSION]: {$packet->username} tried to join with protocol: {$protocol}");
                     $player->close('', '[MultiVersion]: Your game version is not yet supported here.');
-                    $ev->setCancelled();
+                    $event->setCancelled();
                     return;
                 } else {
                     $this->plugin->getLogger()->info("[MULTIVERSION]: {$packet->username} joining with protocol: {$protocol}");
