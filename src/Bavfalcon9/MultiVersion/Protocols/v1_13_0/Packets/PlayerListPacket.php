@@ -15,8 +15,7 @@ namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\DataPacket;
 
-use Bavfalcon9\MultiVersion\Protocols\v1_12_0\Entity\Skin;
-use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\Skin as Skin_13;
+use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\Skin;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SkinAnimation;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SerializedImage;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\types\PlayerListEntry;
@@ -45,11 +44,7 @@ class PlayerListPacket extends DataPacket{
 				$entry->username = $this->getString();
 				$entry->xboxUserId = $this->getString();
 				$entry->platformChatId = $this->getString();
-				$entry->buildPlatform = $this->getLInt();
-				$entry->skin = $this->getSkin();
-				$entry->entityUniqueId = $this->getEntityUniqueId();
-				$entry->isTeacher = false;
-				$entry->isHost = false;
+				$entry->skin = new $this->getSkin();
 			}else{
 				$entry->uuid = $this->getUUID();
 			}
@@ -57,20 +52,23 @@ class PlayerListPacket extends DataPacket{
 		}
     }
 	protected function encodePayload(){
-
 		$this->putByte($this->type);
 		$this->putUnsignedVarInt(count($this->entries));
 		foreach($this->entries as $entry){
 			if($this->type === self::TYPE_ADD){
+				$buildPlatform = (!isset($entry->buildPlatform)) ? -1 : $entry->buildPlatform;
+				$isTeacher = (!isset($entry->isTeacher)) ? false : $entry->isTeacher;
+				$isHost = (!isset($entry->isHost)) ? false : $entry->isHost;
+
 				$this->putUUID($entry->uuid);
 				$this->putEntityUniqueId($entry->entityUniqueId);
 				$this->putString($entry->username);
 				$this->putString($entry->xboxUserId);
 				$this->putString($entry->platformChatId);
-				$this->putLInt($entry->buildPlatform);
-				$this->putSkin(Skin_13::null());
-				$this->putBool(false);
-				$this->putBool(false);
+				$this->putLInt($buildPlatform);
+				$this->putSkin(Skin::null());
+				$this->putBool($isTeacher);
+				$this->putBool($isHost);
 			}else{
 				$this->putUUID($entry->uuid);
 			}
@@ -93,7 +91,7 @@ class PlayerListPacket extends DataPacket{
 		$capeOnClassic = $this->getBool();
 		$capeId = $this->getString();
 		$fullSkinId = $this->getString();
-		return new Skin($skinId, $skinData, $capeData, 'CONVERSION_1.13', $geometryData);
+		return new Skin($skinId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $animationData, $premium, $persona, $capeOnClassic, $capeId);
     }
     private function putSkin($skin) {
         $this->putString($skin->getSkinId());
@@ -133,24 +131,7 @@ class PlayerListPacket extends DataPacket{
 	public function translateCustomPacket($packet) {
 		$this->type = $packet->type;
 		foreach ($packet->entries as $entry) {
-			$cache = $entry->skin;
-			if (!$cache) {
-				$entry->skin = Skin_13::null();
-			} else {
-				$skinData = SerializedImage::fromLegacy($cache->getSkinData());
-				$capeData = SerializedImage::fromLegacy($cache->getCapeData());
-				$skinId = $cache->getSkinId();
-				$geometryName = "Steve";
-				$geometryData = $cache->getGeometryData();
-				$entry->skin = new Skin_13(
-					$skinId,
-					'CONVERSION_1_13',
-					$skinData,
-					[],
-					$capeData,
-					$geometryData
-				);
-			}
+			$entry->skin = Skin::null();
 		};
 		return $this;
 	}

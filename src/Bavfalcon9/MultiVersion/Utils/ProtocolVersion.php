@@ -18,7 +18,7 @@ use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\utils\MainLogger;
 
 class ProtocolVersion {
-    public const DEVELOPER = true;
+    public const DEVELOPER = false; // set to true for debug
     public const VERSIONS = [
         '1.12.0' => 361,
         '1.13.0' => 388
@@ -64,14 +64,14 @@ class ProtocolVersion {
             else continue;
         }
 
-        return '';
+        return ''.$id;
     }
 
-    public function changePacket(String &$name, &$oldPacket) {
+    public function changePacket(String &$name, &$oldPacket, String $type='Sent') {
         if (!isset($this->protocolPackets[$name]) && $this->restricted === true) return null;
         if (!isset($this->protocolPackets[$name])) {
             if (self::DEVELOPER === true) {
-                MainLogger::getLogger()->info("§c[MultiVersion] DEBUG:§e Packet §8[§f {$oldPacket->getName()} §8| §f".$oldPacket::NETWORK_ID."§8]§e requested a change but no change supported.");
+                MainLogger::getLogger()->info("§c[MultiVersion] DEBUG:§e Packet §8[§f {$oldPacket->getName()} §8| §f".$oldPacket::NETWORK_ID."§8]§e requested a change but no change supported §a{$type}§e.");
             }
             return $oldPacket;
         }
@@ -88,6 +88,7 @@ class ProtocolVersion {
 
         $pk->setBuffer($oldPacket->buffer, $oldPacket->offset);
         $oldPacket = $pk;
+        MainLogger::getLogger()->info("§6[MultiVersion] DEBUG: Modified Packet §8[§f {$oldPacket->getName()} §8| §f".$oldPacket::NETWORK_ID."§8]§6 §a{$type}§6.");
         return $oldPacket;
     }
 
