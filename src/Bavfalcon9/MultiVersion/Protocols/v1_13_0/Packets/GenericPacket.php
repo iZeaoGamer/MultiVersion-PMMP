@@ -14,6 +14,7 @@
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\DataPacket;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
 
 class GenericPacket extends DataPacket {
 

@@ -45,7 +45,9 @@ class EventManager implements Listener {
             $newVersion = new ProtocolVersion(ProtocolVersion::VERSIONS['1.13.0'], '1.13.0', false);
             $newVersion->setProtocolPackets([
                 "LoginPacket" => 0x01,
-                "StartGamePacket" => 0x0b
+                "StartGamePacket" => 0x0b,
+                "PlayerListPacket" => 0x3f,
+                "PlayerSkinPacket" => 0x5d
             ]);
             $newVersion = $this->packetManager->registerProtocol($newVersion);
             define('MULTIVERSION_v1_13_0', $this->plugin->getDataFolder().'v1_13_0');
