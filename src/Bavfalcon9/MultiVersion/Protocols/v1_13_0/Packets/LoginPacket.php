@@ -30,7 +30,6 @@ use pocketmine\network\mcpe\protocol\ProtocolInfo;
 class LoginPacket extends LP{
 	public const NETWORK_ID = 0x01;
     public const EDITION_POCKET = 0;
-
 	/** @var string */
 	public $username;
 	/** @var int */
@@ -68,7 +67,7 @@ class LoginPacket extends LP{
 	}
 	protected function decodePayload(){
 		$this->protocol = ((\unpack("N", $this->get(4))[1] << 32 >> 32));
-		$this->protocol = 388; // This is a 1.13 hack?
+		$this->protocol = ProtocolInfo::CURRENT_PROTOCOL; // Hack to allow a bypass
 		if($this->protocol !== ProtocolInfo::CURRENT_PROTOCOL){
 			if($this->protocol > 0xffff){ //guess MCPE <= 1.1
 				$this->offset -= 6;
@@ -120,6 +119,7 @@ class LoginPacket extends LP{
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleLogin($this);
     }
+
 
     public function translateLogin($packet) {
         // $this->protocol =  Why did i do this?

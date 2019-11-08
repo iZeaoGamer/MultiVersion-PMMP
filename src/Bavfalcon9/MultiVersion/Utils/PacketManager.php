@@ -29,6 +29,7 @@ class PacketManager {
     private $plugin;
     /** @var Array<String> */
     private $oldplayers = [];
+    /** @var Array */
     private $queue = []; // Packet queue to prevent duplications
 
     public function __construct(Main $pl) {
@@ -54,10 +55,12 @@ class PacketManager {
         if ($packet instanceof LoginPacket) {
             $protocol = $packet->protocol;
             if (isset($this->queue[$packet->username]) and in_array($nId, $this->queue[$packet->username])) {
-                $this->plugin->getLogger()->debug("§eUser: {$packet->username} [hacking login with protocol: {$protocol}]");
-                $pc = $this->registered[$protocol];
+                $oldProto = $this->oldplayers[$packet->username];
+                $this->plugin->getLogger()->debug("§eUser: {$packet->username} [attempting to hack login for protocol: {$protocol}]");
+                $pc = $this->registered[$oldProto];
                 $pkN = $pc->getPacketName($nId);
                 $pc->translateLogin($packet); // Hoping this works?
+                unset($this->loginCache[$packet->username]);
                 array_splice($this->queue[$packet->username], array_search($nId, $this->queue[$packet->username]));
                 return;
             }
@@ -65,7 +68,7 @@ class PacketManager {
                 if (!isset($this->registered[$protocol])) {
                     if (isset($this->queue[$packet->username])) unset($this->queue[$packet->username]);
                     $this->plugin->getLogger()->critical("{$packet->username} tried to join with protocol: {$protocol}");
-                    $player->close('', '[MultiVersion]: Your game version is not yet supported here. [' . $protocol . ']');
+                    $player->close('', '§c[MultiVersion]: Your game version is not yet supported here. [' . $protocol . ']');
                     $event->setCancelled();
                     return;
                 } else {
