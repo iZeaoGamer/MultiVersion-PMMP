@@ -124,7 +124,7 @@ class StartGamePacket extends DataPacket{
 	public $blockTable = null;
 	/** @var array|null string (name) => int16 (legacyID) */
 	public $itemTable = null;
-	public $customTranslation = true;
+	public $customTranslation = true; // Multiversion
 
 	protected function decodePayload(){
 		$this->entityUniqueId = $this->getEntityUniqueId();

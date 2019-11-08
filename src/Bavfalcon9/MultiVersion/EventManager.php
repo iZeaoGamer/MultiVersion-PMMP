@@ -44,7 +44,7 @@ class EventManager implements Listener {
     private function loadMultiVersion() {
         if ($this->plugin->server_version === '1.12.0') {
             // 1.13 support on MCPE 1.12
-            $newVersion = new ProtocolVersion(ProtocolVersion::VERSIONS['1.13.0'], '1.12.0', false);
+            $newVersion = new ProtocolVersion(ProtocolVersion::VERSIONS['1.13.0'], '1.13.0', false);
             $newVersion->setProtocolPackets([
                 "LoginPacket" => 0x01,
                 "StartGamePacket" => 0x0b,
@@ -54,18 +54,20 @@ class EventManager implements Listener {
                 "ResourcePackDataInfoPacket" => 0x52,
             ]);
             $newVersion = $this->packetManager->registerProtocol($newVersion);
-            define('MULTIVERSION_v1_12_0', $this->plugin->getDataFolder().'v1_12_0');
-            if (!$newVersion) MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.12.x");
+            define('MULTIVERSION_v1_13_0', $this->plugin->getDataFolder().'v1_13_0');
+            if (!$newVersion) MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.13.x");
+            else MainLogger::getLogger()->info("§aLoaded support for: 1.13.x");
         }
         if ($this->plugin->server_version === '1.13.0') {
             // 1.12 support on MCPE 1.13
-            $newVersion = new ProtocolVersion(ProtocolVersion::VERSIONS['1.12.0'], '1.13.0', false);
+            $newVersion = new ProtocolVersion(ProtocolVersion::VERSIONS['1.12.0'], '1.12.0', false);
             $newVersion->setProtocolPackets([
-                /* TO DO */
+                "LoginPacket" => 0x01
             ]);
             $newVersion = $this->packetManager->registerProtocol($newVersion);
-            define('MULTIVERSION_v1_13_0', $this->plugin->getDataFolder().'v1_13_0');
-            if (!$newVersion) MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.13.x");
+            define('MULTIVERSION_v1_12_0', $this->plugin->getDataFolder().'v1_12_0');
+            if (!$newVersion) MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.12.x");
+            else MainLogger::getLogger()->info("§aLoaded support for: 1.12.x");
         }
     }
 

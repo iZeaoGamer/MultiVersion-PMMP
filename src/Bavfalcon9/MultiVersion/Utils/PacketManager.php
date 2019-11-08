@@ -54,23 +54,22 @@ class PacketManager {
         if ($packet instanceof LoginPacket) {
             $protocol = $packet->protocol;
             if (isset($this->queue[$packet->username]) and in_array($nId, $this->queue[$packet->username])) {
-                $packet->protocol = ProtocolInfo::CURRENT_PROTOCOL;
-                $packet->clientData['SkinGeometryData'] = $packet->clientData['SkinGeometry'];
-                $packet->clientData['SkinImageHeight'] = 64;
-                $packet->clientData['SkinImageWidth'] = 64;
+                $this->plugin->getLogger()->debug("§eUser: {$packet->username} [hacking login with protocol: {$protocol}]");
+                $pc = $this->registered[$protocol];
+                $pkN = $pc->getPacketName($nId);
+                $pc->translateLogin($packet); // Hoping this works?
                 array_splice($this->queue[$packet->username], array_search($nId, $this->queue[$packet->username]));
                 return;
             }
             if ($protocol !== ProtocolInfo::CURRENT_PROTOCOL) {
-                /* check versions */
                 if (!isset($this->registered[$protocol])) {
-                    // Protocol not supported.
-                    $this->plugin->getLogger()->critical("[MULTIVERSION]: {$packet->username} tried to join with protocol: {$protocol}");
-                    $player->close('', '[MultiVersion]: Your game version is not yet supported here.');
-                    $ev->setCancelled();
+                    if (isset($this->queue[$packet->username])) unset($this->queue[$packet->username]);
+                    $this->plugin->getLogger()->critical("{$packet->username} tried to join with protocol: {$protocol}");
+                    $player->close('', '[MultiVersion]: Your game version is not yet supported here. [' . $protocol . ']');
+                    $event->setCancelled();
                     return;
                 } else {
-                    $this->plugin->getLogger()->info("[MULTIVERSION]: {$packet->username} joining with protocol: {$protocol}");
+                    $this->plugin->getLogger()->debug("§e {$packet->username} joining with protocol: {$protocol}");
                     $this->oldplayers[$packet->username] = $protocol;
                     $this->queue[$packet->username] = [];
                     array_push($this->queue[$packet->username], $nId);
@@ -80,7 +79,6 @@ class PacketManager {
                     $this->handleOldRecieved($packet, $player);
                     $event->setCancelled();
                     return;
-                    // LOGIN HANDLE?
                 }
             } else {
                 return;
@@ -121,7 +119,7 @@ class PacketManager {
             $success = $protocol->changePacket($pkN, $packet);
             
             if (!$success) {
-                $this->plugin->getLogger()->critical("[MULTIVERSION]: Tried to send an unknown packet[{$nId}] to player: {$player->getName()}");
+                $this->plugin->getLogger()->critical("Tried to send an unknown packet[{$nId}] to player: {$player->getName()}");
                 return;
             }
             array_push($this->queue[$player->getName()], $nId);

@@ -81,4 +81,17 @@ class ProtocolVersion {
         $oldPacket = $pk;
         return $oldPacket;
     }
+
+    public function translateLogin($packet) {
+        if (!isset($this->protocolPackets['LoginPacket'])) {
+            return $oldPacket;
+        } else {
+            $pk = $this->dir . 'LoginPacket';
+            $pk = new $pk;
+            $pk->translateLogin($packet);
+            $pk->setBuffer($packet->buffer, $packet->offset);
+            $packet = $pk;
+            return $packet;
+        }
+    }
 }

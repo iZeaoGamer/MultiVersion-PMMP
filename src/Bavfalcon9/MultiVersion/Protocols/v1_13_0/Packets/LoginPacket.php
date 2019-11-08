@@ -1,17 +1,24 @@
 <?php
-/***
- *    ___  ___      _ _   _ _   _               _             
- *    |  \/  |     | | | (_) | | |             (_)            
- *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
- *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \ 
- *    | |  | | |_| | | |_| \ \_/ /  __/ |  \__ \ | (_) | | | |
- *    \_|  |_/\__,_|_|\__|_|\___/ \___|_|  |___/_|\___/|_| |_|
- * 
- * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
- *                                                            
- */
+/*
+ *
+ *  ____            _        _   __  __ _                  __  __ ____
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
+ * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * @author PocketMine Team
+ * @link http://www.pocketmine.net/
+ *
+ *
+*/
 declare(strict_types=1);
-namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
+namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
 use pocketmine\utils\Binary;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\utils\BinaryStream;
@@ -22,7 +29,8 @@ use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 class LoginPacket extends LP{
 	public const NETWORK_ID = 0x01;
-	public const EDITION_POCKET = 0;
+    public const EDITION_POCKET = 0;
+
 	/** @var string */
 	public $username;
 	/** @var int */
@@ -60,7 +68,7 @@ class LoginPacket extends LP{
 	}
 	protected function decodePayload(){
 		$this->protocol = ((\unpack("N", $this->get(4))[1] << 32 >> 32));
-		$this->protocol = ProtocolInfo::CURRENT_PROTOCOL; // This is a 1.12 hack?
+		$this->protocol = 388; // This is a 1.13 hack?
 		if($this->protocol !== ProtocolInfo::CURRENT_PROTOCOL){
 			if($this->protocol > 0xffff){ //guess MCPE <= 1.1
 				$this->offset -= 6;
@@ -111,5 +119,14 @@ class LoginPacket extends LP{
 	}
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleLogin($this);
-	}
+    }
+
+    public function translateLogin($packet) {
+        // $this->protocol =  Why did i do this?
+        $this->protocol = ProtocolInfo::CURRENT_PROTOCOL; // required to assign a temporary bypass through the server.
+        $this->clientData = $packet->clientData;
+        $this->clientData['SkinGeometry'] = $packet->clientData['SkinGeometryData'];
+        return $this;   
+    }
+    
 }
