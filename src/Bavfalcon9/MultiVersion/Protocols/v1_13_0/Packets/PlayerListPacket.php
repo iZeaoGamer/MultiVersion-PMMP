@@ -10,11 +10,9 @@
  * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
  *                                                            
  */
-
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\DataPacket;
-
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\Skin;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SkinAnimation;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SerializedImage;
@@ -41,10 +39,14 @@ class PlayerListPacket extends DataPacket{
 			$entry = new PlayerListEntry();
 			if($this->type === self::TYPE_ADD){
 				$entry->uuid = $this->getUUID();
+				$entry->entityUniqueId = $this->getEntityUniqueId();
 				$entry->username = $this->getString();
 				$entry->xboxUserId = $this->getString();
 				$entry->platformChatId = $this->getString();
-				$entry->skin = new $this->getSkin();
+				$entry->buildPlatform = $this->getLInt();
+				$entry->skin = $this->getSkin(); # test
+				$entry->isTeacher = $this->getBool();
+				$entry->isHost = $this->getBool();
 			}else{
 				$entry->uuid = $this->getUUID();
 			}
@@ -59,7 +61,6 @@ class PlayerListPacket extends DataPacket{
 				$buildPlatform = (!isset($entry->buildPlatform)) ? -1 : $entry->buildPlatform;
 				$isTeacher = (!isset($entry->isTeacher)) ? false : $entry->isTeacher;
 				$isHost = (!isset($entry->isHost)) ? false : $entry->isHost;
-
 				$this->putUUID($entry->uuid);
 				$this->putEntityUniqueId($entry->entityUniqueId);
 				$this->putString($entry->username);
@@ -123,11 +124,9 @@ class PlayerListPacket extends DataPacket{
 		$data = $this->getString();
 		return new SerializedImage($width, $height, $data);
 	}
-
 	public function handle(NetworkSession $session) : bool{
 		return $session->handlePlayerList($this);
 	}
-
 	public function translateCustomPacket($packet) {
 		$this->type = $packet->type;
 		foreach ($packet->entries as $entry) {

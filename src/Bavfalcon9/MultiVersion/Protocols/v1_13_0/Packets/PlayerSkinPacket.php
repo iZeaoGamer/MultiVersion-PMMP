@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
 #include <rules/DataPacket.h>
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SerializedImage;
-use Bavfalcon9\MultiVersion\Protocols\v1_12_0\Entity\Skin;
+use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\Skin;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\utils\UUID;
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -38,6 +38,25 @@ class PlayerSkinPacket extends DataPacket{
 	public function handle(NetworkSession $session) : bool{
 		return $session->handlePlayerSkin($this);
     }
+    private function getSkin() {
+		$skinId = $this->getString();
+		$skinResourcePatch = $this->getString();
+		$skinData = $this->getImage();
+		$animationCount = $this->getLInt();
+		$animations = [];
+		for($i = 0, $count = $animationCount; $i < $count; ++$i){
+			$animations[] = new SkinAnimation($this->getImage(), $this->getLInt(), $this->getLFloat());
+		}
+		$capeData = $this->getImage();
+		$geometryData = $this->getString();
+		$animationData = $this->getString();
+		$premium = $this->getBool();
+		$persona = $this->getBool();
+		$capeOnClassic = $this->getBool();
+		$capeId = $this->getString();
+		$fullSkinId = $this->getString();
+		return new Skin($skinId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $animationData, $premium, $persona, $capeOnClassic, $capeId);
+    }
     private function putSkin($skin) {
         $this->putString($skin->getSkinId());
 		$this->putString($skin->getSkinResourcePatch());
@@ -56,25 +75,6 @@ class PlayerSkinPacket extends DataPacket{
 		$this->putBool($skin->isCapeOnClassic());
 		$this->putString($skin->getCapeId());
 		$this->putString($skin->getFullSkinId());
-    }
-    private function getSkin() {
-		$skinId = $this->getString();
-		$skinResourcePatch = $this->getString();
-		$skinData = $this->getImage();
-		$animationCount = $this->getLInt();
-		$animations = [];
-		for($i = 0, $count = $animationCount; $i < $count; ++$i){
-			$animations[] = new SkinAnimation($this->getImage(), $this->getLInt(), $this->getLFloat());
-		}
-		$capeData = $this->getImage();
-		$geometryData = $this->getString();
-		$animationData = $this->getString();
-		$premium = $this->getBool();
-		$persona = $this->getBool();
-		$capeOnClassic = $this->getBool();
-		$capeId = $this->getString();
-		$fullSkinId = $this->getString();
-		return new Skin($skinId, $skinData, $capeData, 'CONVERSION_1.13', $geometryData);
 	}
 	private function putImage(SerializedImage $image) : void{
 		$this->putLInt($image->getWidth());
