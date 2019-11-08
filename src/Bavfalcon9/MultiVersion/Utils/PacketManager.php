@@ -56,7 +56,7 @@ class PacketManager {
             $protocol = $packet->protocol;
             if (isset($this->queue[$packet->username]) and in_array($nId, $this->queue[$packet->username])) {
                 $oldProto = $this->oldplayers[$packet->username];
-                $this->plugin->getLogger()->debug("§eUser: {$packet->username} [attempting to hack login for protocol: {$protocol}]");
+                $this->plugin->getLogger()->debug("§eUser: {$packet->username} [attempting to hack login for protocol: {$oldProto}]");
                 $pc = $this->registered[$oldProto];
                 $pkN = $pc->getPacketName($nId);
                 $pc->translateLogin($packet); // Hoping this works?
