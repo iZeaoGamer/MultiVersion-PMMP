@@ -1,5 +1,5 @@
 <?php
-/***
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -18,18 +18,17 @@ use pocketmine\network\mcpe\PlayerNetworkSessionAdapter;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\LoginPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
-use pocketmine\network\mcpe\protocol\PlayStatusPacket;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 
 class PacketManager {
-    /** @var Array<Float[ProtocolVersion]> */
+    /** @var ProtocolVersion[] */
     private $registered = [];
     /** @var Main */
     private $plugin;
-    /** @var Array<String> */
+    /** @var string[] */
     private $oldplayers = [];
-    /** @var Array */
+    /** @var array */
     private $queue = []; // Packet queue to prevent duplications
 
     public function __construct(Main $pl) {
@@ -48,7 +47,7 @@ class PacketManager {
         return true;
     }
 
-    public function handlePacketRecieve(DataPacketReceiveEvent $event) {
+    public function handlePacketReceive(DataPacketReceiveEvent $event) {
         $packet = $event->getPacket();
         $player = $event->getPlayer();
         $nId = $packet::NETWORK_ID;
@@ -79,7 +78,7 @@ class PacketManager {
                     $pc = $this->registered[$protocol];
                     $pkN = $pc->getPacketName($nId);
                     $pc->changePacket($pkN, $packet);
-                    $this->handleOldRecieved($packet, $player);
+                    $this->handleOldReceived($packet, $player);
                     $event->setCancelled();
                     return;
                 }
@@ -99,11 +98,10 @@ class PacketManager {
             $protocol = $this->registered[$protocol];
             $pkN = $protocol->getPacketName($nId);
             $protocol->changePacket($pkN, $packet);
-            $this->handleOldRecieved($packet, $player);
+            $this->handleOldReceived($packet, $player);
             $event->setCancelled();
             return;
         }
-
     }
 
     public function handlePacketSent(DataPacketSendEvent $event) {
@@ -133,7 +131,7 @@ class PacketManager {
 
     }
 
-    private function handleOldRecieved(DataPacket $packet, Player $player) {
+    private function handleOldReceived(DataPacket $packet, Player $player) {
         /* This needs some updating to handle updated/outdated packets, right now its only for the servers interpretation. */
         $adapter = new PlayerNetworkSessionAdapter($this->plugin->getServer(), $player);
 		$adapter->handleDataPacket($packet);

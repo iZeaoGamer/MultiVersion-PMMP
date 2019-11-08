@@ -1,5 +1,5 @@
 <?php
-/***
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -10,15 +10,16 @@
  * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
  *                                                            
  */
+
 declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
-use pocketmine\utils\Binary;
+
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\utils\BinaryStream;
 use pocketmine\utils\MainLogger;
 use pocketmine\utils\Utils;
 use pocketmine\network\mcpe\protocol\LoginPacket as LP;
-use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 class LoginPacket extends LP{
 	public const NETWORK_ID = 0x01;

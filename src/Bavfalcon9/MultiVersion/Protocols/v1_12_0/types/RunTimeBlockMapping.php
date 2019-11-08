@@ -1,5 +1,5 @@
 <?php
-/***
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -76,12 +76,13 @@ final class RuntimeBlockMapping{
 		mt_srand($postSeed); //restore a good quality seed that isn't dependent on PID
 		return $table;
 	}
-	/**
-	 * @param int $id
-	 * @param int $meta
-	 *
-	 * @return int
-	 */
+
+    /**
+     * @param int $id
+     * @param int $meta
+     *
+     * @return int
+     */
 	public static function toStaticRuntimeId(int $id, int $meta = 0) : int{
 		/*
 		 * try id+meta first

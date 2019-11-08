@@ -1,5 +1,6 @@
 <?php
-/***
+
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -10,9 +11,10 @@
  * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
  *                                                            
  */
+
 namespace Bavfalcon9\MultiVersion\Utils;
 
-use pocketmine\network\mcpe\DataPacket;
+use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\utils\MainLogger;
 
 class ProtocolVersion {
@@ -28,9 +30,11 @@ class ProtocolVersion {
     private $minecraftVersion = '1.13.0';
 
     /**
-     * @return Void
+     * @param int  $protocol
+     * @param String $MCPE
+     * @param bool   $restrict
      */
-    public function __construct(Float $protocol, String $MCPE, Bool $restrict=false) {
+    public function __construct(int $protocol, String $MCPE, Bool $restrict=false) {
         $fixedMCPE = 'v'.implode('_', explode('.', $MCPE));
         $this->protocol = $protocol;
         $this->dir = "Bavfalcon9\\MultiVersion\\Protocols\\".$fixedMCPE."\\Packets\\";
@@ -42,11 +46,11 @@ class ProtocolVersion {
         $this->protocolPackets = $packets;
     }
 
-    public function getProtocol(): Float {
+    public function getProtocol(): int {
         return $this->protocol;
     }
 
-    public function getProtocolPackets(): Array {
+    public function getProtocolPackets(): array {
         return $this->protocolPackets;
     }
 

@@ -1,5 +1,5 @@
 <?php
-/***
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -12,11 +12,9 @@
  */
 namespace Bavfalcon9\MultiVersion;
 
-use Bavfalcon9\MultiVersion\Main;
 use Bavfalcon9\MultiVersion\Utils\PacketManager;
 use Bavfalcon9\MultiVersion\Utils\ProtocolVersion;
 use pocketmine\event\Listener;
-use pocketmine\utils\TextFormat as TF;
 use pocketmine\utils\MainLogger;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
@@ -31,8 +29,8 @@ class EventManager implements Listener {
         $this->loadMultiVersion();
     }
 
-    public function onRecieve(DataPacketReceiveEvent $event) {
-        $this->packetManager->handlePacketRecieve($event);
+    public function onReceive(DataPacketReceiveEvent $event) {
+        $this->packetManager->handlePacketReceive($event);
         return;
     }
 
@@ -62,6 +60,7 @@ class EventManager implements Listener {
                 "StartGamePacket" => 0x0b,
                 "RespawnPacket" => 0x2d,
                 "PlayerListPacket" => 0x3f,
+                "PlayerSkinPacket" => 0x5d,
                 "ExplodePacket" => 0x17,
                 "ResourcePackDataInfoPacket" => 0x52,
             ]);

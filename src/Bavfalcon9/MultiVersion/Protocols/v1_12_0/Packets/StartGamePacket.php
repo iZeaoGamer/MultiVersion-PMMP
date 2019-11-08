@@ -1,5 +1,6 @@
 <?php
-/***
+
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -12,13 +13,13 @@
  */
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
+
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\NetworkBinaryStream;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use Bavfalcon9\MultiVersion\Protocols\v1_12_0\types\RuntimeBlockMapping;
 use pocketmine\network\mcpe\protocol\DataPacket;
-use pocketmine\network\mcpe\protocol\StartGamePacket as SG;
 
 class StartGamePacket extends DataPacket{
 	public const NETWORK_ID = 0x0b;

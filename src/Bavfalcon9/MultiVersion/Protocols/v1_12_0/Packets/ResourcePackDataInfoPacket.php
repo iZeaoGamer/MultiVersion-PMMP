@@ -1,5 +1,5 @@
 <?php
-/***
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -12,10 +12,11 @@
  */
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
-use pocketmine\math\Vector3;
+
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\types\ResourcePackType;
+
 class ResourcePackDataInfoPacket extends DataPacket {
 	public const NETWORK_ID = 0x52;
 	/** @var string */
@@ -53,4 +54,5 @@ class ResourcePackDataInfoPacket extends DataPacket {
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleResourcePackDataInfo($this);
 	}
+
 }

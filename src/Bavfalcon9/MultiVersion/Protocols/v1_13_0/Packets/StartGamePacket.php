@@ -1,5 +1,5 @@
 <?php
-/***
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -27,7 +27,7 @@ use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use function count;
 use function file_get_contents;
 use function json_decode;
-use const pocketmine\RESOURCE_PATH;
+
 class StartGamePacket extends DataPacket{
     public const NETWORK_ID = ProtocolInfo::START_GAME_PACKET;
     public $customTranslation = true;

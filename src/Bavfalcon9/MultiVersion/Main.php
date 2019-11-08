@@ -1,5 +1,6 @@
 <?php
-/***
+
+/**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
  *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
@@ -10,17 +11,11 @@
  * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
  *                                                            
  */
+
 namespace Bavfalcon9\MultiVersion;
 
-/* Commands */
 use pocketmine\plugin\PluginBase;
-use pocketmine\command\Command;
-use pocketmine\command\CommandSender;
-use pocketmine\permission\Permission;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
-use pocketmine\Player;
-use pocketmine\Server;
-use Bavfalcon9\MultiVersion\EventManager;
 use Bavfalcon9\MultiVersion\Utils\ProtocolVersion;
 
 class Main extends PluginBase {
@@ -53,5 +48,4 @@ class Main extends PluginBase {
             }
         }
     }
-
 }
