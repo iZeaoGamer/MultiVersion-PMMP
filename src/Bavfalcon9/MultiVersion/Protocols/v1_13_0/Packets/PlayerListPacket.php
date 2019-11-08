@@ -16,10 +16,11 @@ use pocketmine\network\mcpe\protocol\DataPacket;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\Skin;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SkinAnimation;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SerializedImage;
-use Bavfalcon9\MultiVersion\Protocols\v1_13_0\types\PlayerListEntry;
+use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use pocketmine\network\mcpe\protocol\PlayerListPacket as PMListPacket;
 use function count;
-class PlayerListPacket extends DataPacket{
+class PlayerListPacket extends PMListPacket{
 	public const NETWORK_ID = ProtocolInfo::PLAYER_LIST_PACKET;
 	public const TYPE_ADD = 0;
 	public const TYPE_REMOVE = 1;
@@ -123,9 +124,6 @@ class PlayerListPacket extends DataPacket{
 		$height = $this->getLInt();
 		$data = $this->getString();
 		return new SerializedImage($width, $height, $data);
-	}
-	public function handle(NetworkSession $session) : bool{
-		return $session->handlePlayerList($this);
 	}
 	public function translateCustomPacket($packet) {
 		$this->type = $packet->type;
