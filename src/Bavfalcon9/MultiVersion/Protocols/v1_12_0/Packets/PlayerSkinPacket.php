@@ -24,7 +24,9 @@ use pocketmine\utils\UUID;
 
 class PlayerSkinPacket extends DataPacket{
     public const NETWORK_ID = 0x5d;
+
     public $customTranslation = true;
+
     /** @var UUID */
     public $uuid;
     /** @var string */

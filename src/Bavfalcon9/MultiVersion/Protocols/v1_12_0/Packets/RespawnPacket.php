@@ -20,26 +20,27 @@ use pocketmine\network\mcpe\protocol\RespawnPacket as PMRespawn;
 use pocketmine\network\mcpe\protocol\DataPacket;
 
 class RespawnPacket extends DataPacket{
-	public const NETWORK_ID = 0x2d;
+    public const NETWORK_ID = 0x2d;
 
     public $customTranslation = true;
-	/** @var Vector3 */
-	public $position;
+    /** @var Vector3 */
+    public $position;
 
-	protected function decodePayload(){
-		$this->position = $this->getVector3();
-	}
+    protected function decodePayload(){
+        $this->position = $this->getVector3();
+    }
 
-	protected function encodePayload(){
-		$this->putVector3($this->position);
-	}
+    protected function encodePayload(){
+        $this->putVector3($this->position);
+    }
 
-	public function handle(NetworkSession $session) : bool{
-		return $session->handleRespawn($this);
-	}
+    public function handle(NetworkSession $session) : bool{
+        return $session->handleRespawn($this);
+    }
 
-	public function translateCustomPacket(PMRespawn $packet){
-	    $this->position = $packet->position;
-	    return $this;
+    public function translateCustomPacket(PMRespawn $packet){
+        $this->position = $packet->position;
+
+        return $this;
     }
 }

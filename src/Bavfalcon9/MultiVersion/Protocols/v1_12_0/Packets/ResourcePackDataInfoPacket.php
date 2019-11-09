@@ -20,45 +20,45 @@ use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\types\ResourcePackType;
 
-class ResourcePackDataInfoPacket extends DataPacket {
-	public const NETWORK_ID = 0x52;
+class ResourcePackDataInfoPacket extends DataPacket{
+    public const NETWORK_ID = 0x52;
 
-	/** @var string */
-	public $packId;
-	/** @var int */
-	public $maxChunkSize;
-	/** @var int */
-	public $chunkCount;
-	/** @var int */
-	public $compressedPackSize;
-	/** @var string */
-	public $sha256;
-	/** @var bool */
-	public $isPremium = false;
-	/** @var int */
-	public $packType = ResourcePackType::RESOURCES; //TODO: check the values for this
+    /** @var string */
+    public $packId;
+    /** @var int */
+    public $maxChunkSize;
+    /** @var int */
+    public $chunkCount;
+    /** @var int */
+    public $compressedPackSize;
+    /** @var string */
+    public $sha256;
+    /** @var bool */
+    public $isPremium = false;
+    /** @var int */
+    public $packType = ResourcePackType::RESOURCES; //TODO: check the values for this
 
-	protected function decodePayload(){
-		$this->packId = $this->getString();
-		$this->maxChunkSize = $this->getLInt();
-		$this->chunkCount = $this->getLInt();
-		$this->compressedPackSize = $this->getLLong();
-		$this->sha256 = $this->getString();
-		$this->isPremium = $this->getBool();
-		$this->packType = $this->getByte();
-	}
+    protected function decodePayload(){
+        $this->packId = $this->getString();
+        $this->maxChunkSize = $this->getLInt();
+        $this->chunkCount = $this->getLInt();
+        $this->compressedPackSize = $this->getLLong();
+        $this->sha256 = $this->getString();
+        $this->isPremium = $this->getBool();
+        $this->packType = $this->getByte();
+    }
 
-	protected function encodePayload(){
-		$this->putString($this->packId);
-		$this->putLInt($this->maxChunkSize);
-		$this->putLInt($this->chunkCount);
-		$this->putLLong($this->compressedPackSize);
-		$this->putString($this->sha256);
-		$this->putBool($this->isPremium);
-		$this->putByte($this->packType);
-	}
+    protected function encodePayload(){
+        $this->putString($this->packId);
+        $this->putLInt($this->maxChunkSize);
+        $this->putLInt($this->chunkCount);
+        $this->putLLong($this->compressedPackSize);
+        $this->putString($this->sha256);
+        $this->putBool($this->isPremium);
+        $this->putByte($this->packType);
+    }
 
-	public function handle(NetworkSession $session) : bool{
-		return $session->handleResourcePackDataInfo($this);
-	}
+    public function handle(NetworkSession $session) : bool{
+        return $session->handleResourcePackDataInfo($this);
+    }
 }

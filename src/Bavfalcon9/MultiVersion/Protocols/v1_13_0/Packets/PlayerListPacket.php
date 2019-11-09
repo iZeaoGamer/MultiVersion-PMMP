@@ -25,130 +25,131 @@ use pocketmine\network\mcpe\protocol\PlayerListPacket as PMListPacket;
 use function count;
 
 class PlayerListPacket extends PMListPacket{
-	public const NETWORK_ID = ProtocolInfo::PLAYER_LIST_PACKET;
-	public const TYPE_ADD = 0;
-	public const TYPE_REMOVE = 1;
 
-	/** @var PlayerListEntry[] */
-	public $entries = [];
-	/** @var int */
-	public $type;
+    public const NETWORK_ID = ProtocolInfo::PLAYER_LIST_PACKET;
+    public const TYPE_ADD = 0;
+    public const TYPE_REMOVE = 1;
 
-	public $customTranslation = true; // MUTLIVERSION
+    /** @var PlayerListEntry[] */
+    public $entries = [];
+    /** @var int */
+    public $type;
 
-	public function clean(){
-		$this->entries = [];
-		return parent::clean();
-	}
+    public $customTranslation = true; // MUTLIVERSION
 
-	protected function decodePayload(){
-		$this->type = $this->getByte();
-		$count = $this->getUnsignedVarInt();
-		for($i = 0; $i < $count; ++$i){
-			$entry = new PlayerListEntry();
-			if($this->type === self::TYPE_ADD){
-				$entry->uuid = $this->getUUID();
-				$entry->entityUniqueId = $this->getEntityUniqueId();
-				$entry->username = $this->getString();
-				$entry->xboxUserId = $this->getString();
-				$entry->platformChatId = $this->getString();
-				$entry->buildPlatform = $this->getLInt();
-				$entry->skin = $this->getSkin(); # test
-				$entry->isTeacher = $this->getBool();
-				$entry->isHost = $this->getBool();
-			}else{
-				$entry->uuid = $this->getUUID();
-			}
+    public function clean(){
+        $this->entries = [];
 
-			$this->entries[$i] = $entry;
-		}
+        return parent::clean();
     }
-	protected function encodePayload(){
-		$this->putByte($this->type);
-		$this->putUnsignedVarInt(count($this->entries));
-		foreach($this->entries as $entry){
-			if($this->type === self::TYPE_ADD){
-				$buildPlatform = (!isset($entry->buildPlatform)) ? -1 : $entry->buildPlatform;
-				$isTeacher = (!isset($entry->isTeacher)) ? false : $entry->isTeacher;
-				$isHost = (!isset($entry->isHost)) ? false : $entry->isHost;
-				$this->putUUID($entry->uuid);
-				$this->putEntityUniqueId($entry->entityUniqueId);
-				$this->putString($entry->username);
-				$this->putString($entry->xboxUserId);
-				$this->putString($entry->platformChatId);
-				$this->putLInt($buildPlatform);
-				$this->putSkin(Skin::null());
-				$this->putBool($isTeacher);
-				$this->putBool($isHost);
-			}else{
-				$this->putUUID($entry->uuid);
-			}
-		}
-	}
+
+    protected function decodePayload(){
+        $this->type = $this->getByte();
+        $count = $this->getUnsignedVarInt();
+        for($i = 0; $i < $count; ++$i){
+            $entry = new PlayerListEntry();
+            if($this->type === self::TYPE_ADD){
+                $entry->uuid = $this->getUUID();
+                $entry->entityUniqueId = $this->getEntityUniqueId();
+                $entry->username = $this->getString();
+                $entry->xboxUserId = $this->getString();
+                $entry->platformChatId = $this->getString();
+                $entry->buildPlatform = $this->getLInt();
+                $entry->skin = $this->getSkin(); # test
+                $entry->isTeacher = $this->getBool();
+                $entry->isHost = $this->getBool();
+            }else{
+                $entry->uuid = $this->getUUID();
+            }
+            $this->entries[$i] = $entry;
+        }
+    }
+
+    protected function encodePayload(){
+        $this->putByte($this->type);
+        $this->putUnsignedVarInt(count($this->entries));
+        foreach($this->entries as $entry){
+            if($this->type === self::TYPE_ADD){
+                $buildPlatform = (!isset($entry->buildPlatform)) ? -1 : $entry->buildPlatform;
+                $isTeacher = (!isset($entry->isTeacher)) ? false : $entry->isTeacher;
+                $isHost = (!isset($entry->isHost)) ? false : $entry->isHost;
+                $this->putUUID($entry->uuid);
+                $this->putEntityUniqueId($entry->entityUniqueId);
+                $this->putString($entry->username);
+                $this->putString($entry->xboxUserId);
+                $this->putString($entry->platformChatId);
+                $this->putLInt($buildPlatform);
+                $this->putSkin(Skin::null());
+                $this->putBool($isTeacher);
+                $this->putBool($isHost);
+            }else{
+                $this->putUUID($entry->uuid);
+            }
+        }
+    }
 
     private function getSkin() : Skin{
-		$skinId = $this->getString();
-		$skinResourcePatch = $this->getString();
-		$skinData = $this->getImage();
-		$animationCount = $this->getLInt();
-		$animations = [];
-		for($i = 0, $count = $animationCount; $i < $count; ++$i){
-			$animations[] = new SkinAnimation($this->getImage(), $this->getLInt(), $this->getLFloat());
-		}
+        $skinId = $this->getString();
+        $skinResourcePatch = $this->getString();
+        $skinData = $this->getImage();
+        $animationCount = $this->getLInt();
+        $animations = [];
+        for($i = 0, $count = $animationCount; $i < $count; ++$i){
+            $animations[] = new SkinAnimation($this->getImage(), $this->getLInt(), $this->getLFloat());
+        }
 
-		$capeData = $this->getImage();
-		$geometryData = $this->getString();
-		$animationData = $this->getString();
-		$premium = $this->getBool();
-		$persona = $this->getBool();
-		$capeOnClassic = $this->getBool();
-		$capeId = $this->getString();
-		$fullSkinId = $this->getString();
+        $capeData = $this->getImage();
+        $geometryData = $this->getString();
+        $animationData = $this->getString();
+        $premium = $this->getBool();
+        $persona = $this->getBool();
+        $capeOnClassic = $this->getBool();
+        $capeId = $this->getString();
+        $fullSkinId = $this->getString();
 
-		return new Skin($skinId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $animationData, $premium, $persona, $capeOnClassic, $capeId);
+        return new Skin($skinId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $animationData, $premium, $persona, $capeOnClassic, $capeId);
     }
 
     private function putSkin(Skin $skin) : void{
         $this->putString($skin->getSkinId());
-		$this->putString($skin->getSkinResourcePatch());
-		$this->putImage($skin->getSkinData());
-		$this->putLInt(count($animations = $skin->getAnimations()));
-		foreach($animations as $animation){
-			$this->putImage($animation->getImage());
-			$this->putLInt($animation->getType());
-			$this->putLFloat($animation->getFrames());
-		}
+        $this->putString($skin->getSkinResourcePatch());
+        $this->putImage($skin->getSkinData());
+        $this->putLInt(count($animations = $skin->getAnimations()));
+        foreach($animations as $animation){
+            $this->putImage($animation->getImage());
+            $this->putLInt($animation->getType());
+            $this->putLFloat($animation->getFrames());
+        }
+        $this->putImage($skin->getCapeData());
+        $this->putString($skin->getGeometryData());
+        $this->putString($skin->getAnimationData());
+        $this->putBool($skin->isPremium());
+        $this->putBool($skin->isPersona());
+        $this->putBool($skin->isCapeOnClassic());
+        $this->putString($skin->getCapeId());
+        $this->putString($skin->getFullSkinId());
+    }
 
-		$this->putImage($skin->getCapeData());
-		$this->putString($skin->getGeometryData());
-		$this->putString($skin->getAnimationData());
-		$this->putBool($skin->isPremium());
-		$this->putBool($skin->isPersona());
-		$this->putBool($skin->isCapeOnClassic());
-		$this->putString($skin->getCapeId());
-		$this->putString($skin->getFullSkinId());
-	}
+    public function putImage(SerializedImage $image) : void{
+        $this->putLInt($image->getWidth());
+        $this->putLInt($image->getHeight());
+        $this->putString($image->getData());
+    }
 
-	public function putImage(SerializedImage $image) : void{
-		$this->putLInt($image->getWidth());
-		$this->putLInt($image->getHeight());
-		$this->putString($image->getData());
-	}
+    public function getImage() : SerializedImage{
+        $width = $this->getLInt();
+        $height = $this->getLInt();
+        $data = $this->getString();
 
-	public function getImage() : SerializedImage{
-		$width = $this->getLInt();
-		$height = $this->getLInt();
-		$data = $this->getString();
+        return new SerializedImage($width, $height, $data);
+    }
 
-		return new SerializedImage($width, $height, $data);
-	}
+    public function translateCustomPacket($packet){
+        $this->type = $packet->type;
+        foreach($packet->entries as $entry){
+            $entry->skin = Skin::null();
+        };
 
-	public function translateCustomPacket($packet) {
-		$this->type = $packet->type;
-		foreach ($packet->entries as $entry) {
-			$entry->skin = Skin::null();
-		};
-
-		return $this;
+        return $this;
     }
 }
