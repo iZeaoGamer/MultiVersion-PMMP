@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
 
+use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\types\RuntimeBlockMapping;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -23,7 +24,7 @@ use pocketmine\network\mcpe\protocol\types\RuntimeBlockMapping as PMRuntimeBlock
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket as PMUpdateBlock;
 
-class UpdateBlockPacket extends DataPacket{
+class UpdateBlockPacket extends DataPacket implements CustomTranslator{
     public const NETWORK_ID = ProtocolInfo::UPDATE_BLOCK_PACKET;
 
     public const FLAG_NONE = 0b0000;
@@ -51,8 +52,6 @@ class UpdateBlockPacket extends DataPacket{
     /** @var int */
     public $dataLayerId = self::DATA_LAYER_NORMAL;
 
-    public $customTranslation = true;
-
     protected function decodePayload(){
         $this->getBlockPosition($this->x, $this->y, $this->z);
         $this->blockRuntimeId = $this->getUnsignedVarInt();
@@ -71,7 +70,12 @@ class UpdateBlockPacket extends DataPacket{
         return $session->handleUpdateBlock($this);
     }
 
-    public function translateCustomPacket(PMUpdateBlock $packet) {
+    /**
+     * @param PMUpdateBlock $packet
+     *
+     * @return $this
+     */
+    public function translateCustomPacket($packet) {
         list($id, $meta) = PMRuntimeBlockMapping::fromStaticRuntimeId($packet->blockRuntimeId);
         $this->blockRuntimeId = RuntimeBlockMapping::toStaticRuntimeId($id, $meta);
 

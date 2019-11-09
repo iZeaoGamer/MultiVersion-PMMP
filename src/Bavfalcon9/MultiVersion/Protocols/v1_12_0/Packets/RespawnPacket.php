@@ -14,15 +14,15 @@
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
 
+use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\NetworkSession;
-use pocketmine\network\mcpe\protocol\RespawnPacket as PMRespawn;
 use pocketmine\network\mcpe\protocol\DataPacket;
+use pocketmine\network\mcpe\protocol\RespawnPacket as PMRespawn;
 
-class RespawnPacket extends DataPacket{
+class RespawnPacket extends DataPacket implements CustomTranslator{
     public const NETWORK_ID = 0x2d;
 
-    public $customTranslation = true;
     /** @var Vector3 */
     public $position;
 
@@ -38,7 +38,12 @@ class RespawnPacket extends DataPacket{
         return $session->handleRespawn($this);
     }
 
-    public function translateCustomPacket(PMRespawn $packet){
+    /**
+     * @param PMRespawn $packet
+     *
+     * @return $this
+     */
+    public function translateCustomPacket($packet){
         $this->position = $packet->position;
 
         return $this;

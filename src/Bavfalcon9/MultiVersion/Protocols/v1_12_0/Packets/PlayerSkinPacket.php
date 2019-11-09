@@ -16,16 +16,15 @@ declare(strict_types=1);
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
 
+use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
 use Bavfalcon9\MultiVersion\Protocols\v1_12_0\Entity\Skin;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\DataPacket;
-use pocketmine\network\mcpe\protocol\PlayerSkinPacket as PMPLayerSkin;
+use pocketmine\network\mcpe\protocol\PlayerSkinPacket as PMPlayerSkin;
 use pocketmine\utils\UUID;
 
-class PlayerSkinPacket extends DataPacket{
+class PlayerSkinPacket extends DataPacket implements CustomTranslator{
     public const NETWORK_ID = 0x5d;
-
-    public $customTranslation = true;
 
     /** @var UUID */
     public $uuid;
@@ -67,7 +66,12 @@ class PlayerSkinPacket extends DataPacket{
         return $session->handlePlayerSkin($this);
     }
 
-    public function translateCustomPacket(PMPLayerSkin $packet){
+    /**
+     * @param PMPlayerSkin $packet
+     *
+     * @return $this
+     */
+    public function translateCustomPacket($packet){
         $skin = $packet->skin;
         $this->uuid = $packet->uuid;
         $this->oldSkinName = "";

@@ -25,7 +25,6 @@ use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 
 class PlayerSkinPacket extends DataPacket{
-
     public const NETWORK_ID = ProtocolInfo::PLAYER_SKIN_PACKET;
 
     /** @var UUID */

@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Bavfalcon9\MultiVersion\Utils;
 
+use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\utils\MainLogger;
 
@@ -91,7 +92,7 @@ class ProtocolVersion {
             echo "[MULTIVERSION]: Packet change requested on non datapacket typing. {$oldPacket->getName()} | " . $oldPacket::NETWORK_ID . "\n";
         }
 
-        if (isset($pk->customTranslation)) {
+        if ($pk instanceof CustomTranslator) {
             $pk = $pk->translateCustomPacket($oldPacket);
         }
 
@@ -104,7 +105,7 @@ class ProtocolVersion {
 
     public function translateLogin($packet) {
         if (!isset($this->protocolPackets['LoginPacket'])) {
-            return $oldPacket;
+            return $packet;
         } else {
             $pk = $this->dir . 'LoginPacket';
             $pk = new $pk;

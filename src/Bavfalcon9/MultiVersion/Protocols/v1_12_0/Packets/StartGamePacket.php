@@ -16,14 +16,16 @@ declare(strict_types=1);
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
 
+use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\NetworkBinaryStream;
 use pocketmine\network\mcpe\NetworkSession;
+use pocketmine\network\mcpe\protocol\StartGamePacket as PMStartGame;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use Bavfalcon9\MultiVersion\Protocols\v1_12_0\types\RuntimeBlockMapping;
 use pocketmine\network\mcpe\protocol\DataPacket;
 
-class StartGamePacket extends DataPacket{
+class StartGamePacket extends DataPacket implements CustomTranslator{
     public const NETWORK_ID = 0x0b;
 
     /** @var string|null */
@@ -128,7 +130,6 @@ class StartGamePacket extends DataPacket{
     public $blockTable = null;
     /** @var array|null string (name) => int16 (legacyID) */
     public $itemTable = null;
-    public $customTranslation = true; // Multiversion
 
     protected function decodePayload(){
         $this->entityUniqueId = $this->getEntityUniqueId();
@@ -283,6 +284,11 @@ class StartGamePacket extends DataPacket{
         return $session->handleStartGame($this);
     }
 
+    /**
+     * @param PMStartGame $packet
+     *
+     * @return $this
+     */
     public function translateCustomPacket($packet){
         $this->spawnX = $packet->spawnX;
         $this->spawnY = $packet->spawnY;

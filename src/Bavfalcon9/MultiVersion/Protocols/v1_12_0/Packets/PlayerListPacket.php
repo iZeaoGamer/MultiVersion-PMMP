@@ -16,20 +16,19 @@ declare(strict_types=1);
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
 
+use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\DataPacket;
-use Bavfalcon9\MultiVersion\Protocols\v1_12_0\Entity\Skin;
 use pocketmine\network\mcpe\protocol\PlayerListPacket as PMPlayerList;
+use Bavfalcon9\MultiVersion\Protocols\v1_12_0\Entity\Skin;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use function count;
 
-class PlayerListPacket extends DataPacket{
+class PlayerListPacket extends DataPacket implements CustomTranslator{
     public const NETWORK_ID = 0x3f;
 
     public const TYPE_ADD = 0;
     public const TYPE_REMOVE = 1;
-
-    public $customTranslation = true; // MULTIVERSION
 
     /** @var PlayerListEntry[] */
     public $entries = [];
@@ -97,7 +96,12 @@ class PlayerListPacket extends DataPacket{
         return $session->handlePlayerList($this);
     }
 
-    public function translateCustomPacket(PMPlayerList $packet){
+    /**
+     * @param PMPlayerList $packet
+     *
+     * @return $this
+     */
+    public function translateCustomPacket($packet){
         $this->type = $packet->type;
         foreach($packet->entries as $entry){
             $cache = $entry->skin;

@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
 
+use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\types\RuntimeBlockMapping;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -31,11 +32,8 @@ use function count;
 use function file_get_contents;
 use function json_decode;
 
-class StartGamePacket extends DataPacket{
-
+class StartGamePacket extends DataPacket implements CustomTranslator{
     public const NETWORK_ID = ProtocolInfo::START_GAME_PACKET;
-
-    public $customTranslation = true;
 
     /** @var string|null */
     private static $blockTableCache = null;
@@ -306,7 +304,12 @@ class StartGamePacket extends DataPacket{
         return $session->handleStartGame($this);
     }
 
-    public function translateCustomPacket(PMStartGame $packet){
+    /**
+     * @param PMStartGame $packet
+     *
+     * @return $this
+     */
+    public function translateCustomPacket($packet){
         $this->spawnX = $packet->spawnX;
         $this->spawnY = $packet->spawnY;
         $this->spawnZ = $packet->spawnZ;
