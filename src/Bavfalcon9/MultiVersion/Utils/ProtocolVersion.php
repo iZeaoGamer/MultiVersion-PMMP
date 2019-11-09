@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Bavfalcon9\MultiVersion\Utils;
 
 use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
+use Bavfalcon9\MutliVersion\Utils\API;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\utils\MainLogger;
 
@@ -30,7 +31,9 @@ class ProtocolVersion {
     private $protocolPackets = [];
     private $restricted = false;
     private $dir = '';
+    private $dirPath = '';
     private $minecraftVersion = '1.13.0';
+    private $packetListeners = [];
 
     /**
      * @param int  $protocol
@@ -40,13 +43,25 @@ class ProtocolVersion {
     public function __construct(int $protocol, String $MCPE, Bool $restrict=false) {
         $fixedMCPE = 'v'.implode('_', explode('.', $MCPE));
         $this->protocol = $protocol;
+        $this->dirPath = "Bavfalcon9\\MultiVersion\\Protocols\\".$fixedMCPE."\\";
         $this->dir = "Bavfalcon9\\MultiVersion\\Protocols\\".$fixedMCPE."\\Packets\\";
         $this->restricted = $restrict;
         $this->minecraftVersion = $MCPE;
+        $this->registerListeners();
     }
 
     public function setProtocolPackets(Array $packets) {
         $this->protocolPackets = $packets;
+    }
+
+    public function addPacketListener(PacketListener $listener): Bool {
+        if (!$listener instanceof Listener) return false;
+        if (isset($this->$packetListeners[$listener->getName()])) {
+            return false;
+        } else {
+            $this->addPacketListeners[$listener->getName()] = $listener;
+            return true;
+        }
     }
 
     public function getProtocol(): int {
@@ -72,10 +87,23 @@ class ProtocolVersion {
     }
 
     public function changePacket(String &$name, &$oldPacket, String $type = 'Sent') {
+        $modified = false;
+        foreach ($this->packetListeners as $listener) {
+            if ($listener->getPacketName() === $oldPacket->getName() && $oldPacket::NETWORK_ID === $listener->getPacketNetworkID()) {
+                $success = $listener->onPacketCheck($oldPacket);
+                if (!$success) {
+                    continue;
+                } else {
+                    $listener->onPacketMatch($oldPacket);
+                    $modified = true;
+                    continue;
+                }
+            }
+        }
+        if ($modified) return $oldPacket;
         if (!isset($this->protocolPackets[$name]) && $this->restricted === true) {
             return null;
         }
-
         if (!isset($this->protocolPackets[$name])) {
             if (self::DEVELOPER === true) {
                 MainLogger::getLogger()->info("§c[MultiVersion] DEBUG:§e Packet §8[§f {$oldPacket->getName()} §8| §f".$oldPacket::NETWORK_ID."§8]§e requested a change but no change supported §a{$type}§e.");
@@ -113,6 +141,18 @@ class ProtocolVersion {
             $pk->setBuffer($packet->buffer, $packet->offset);
 
             return $pk;
+        }
+    }
+
+    public function registerListeners() {
+        if (!file_exists($this->dirPath . 'PacketListeners')) return;
+        $listeners = scandir($this->dirPath . 'PacketListeners');
+        foreach ($listeners as $lsn) {
+            if ($lsn === '.' || $lsn === '..') continue;
+
+            $listener = $this->dirPath . "PacketListeners\\$lsn";
+            $listener = new $listener;
+            $this->addPacketListener($listener);
         }
     }
 }

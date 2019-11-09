@@ -66,7 +66,7 @@ class UpdateBlockPacket extends DataPacket implements CustomTranslator{
         $this->putUnsignedVarInt($this->dataLayerId);
     }
 
-    public function handle(NetworkSession $session) : bool{
+    public function handle(NetworkSession $session) : bool {
         return $session->handleUpdateBlock($this);
     }
 

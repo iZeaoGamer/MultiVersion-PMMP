@@ -67,8 +67,7 @@ class PacketManager {
                 $oldProto = $this->oldplayers[$packet->username];
                 $this->plugin->getLogger()->debug("§eUser: {$packet->username} [attempting to hack login for protocol: {$oldProto}]");
                 $pc = $this->registered[$oldProto];
-                $pc->translateLogin($packet); // Hoping this works?
-                //unset($this->loginCache[$packet->username]); // dont know what this is for since this field doesn't exist
+                $pc->translateLogin($packet);
                 array_splice($this->queue[$packet->username], array_search($nId, $this->queue[$packet->username]));
                 return;
             }
@@ -132,6 +131,7 @@ class PacketManager {
             if (!isset($this->queue[$player->getName()])) {
                 $this->queue[$player->getName()] = [];
             }
+            if (!isset($this->oldplayers[$player->getName()])) return;
 
             $protocol = $this->oldplayers[$player->getName()];
             $protocol = $this->registered[$protocol];

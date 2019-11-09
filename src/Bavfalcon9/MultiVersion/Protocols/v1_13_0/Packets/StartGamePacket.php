@@ -309,7 +309,7 @@ class StartGamePacket extends DataPacket implements CustomTranslator{
      *
      * @return $this
      */
-    public function translateCustomPacket($packet){
+    public function translateCustomPacket($packet) {
         $this->spawnX = $packet->spawnX;
         $this->spawnY = $packet->spawnY;
         $this->spawnZ = $packet->spawnZ;
