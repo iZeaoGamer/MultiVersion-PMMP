@@ -1,35 +1,47 @@
 <?php
-
 /**
- *    ___  ___      _ _   _ _   _               _
- *    |  \/  |     | | | (_) | | |             (_)
- *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __
- *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \
+ *    ___  ___      _ _   _ _   _               _             
+ *    |  \/  |     | | | (_) | | |             (_)            
+ *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
+ *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \ 
  *    | |  | | |_| | | |_| \ \_/ /  __/ |  \__ \ | (_) | | | |
  *    \_|  |_/\__,_|_|\__|_|\___/ \___|_|  |___/_|\___/|_| |_|
- *
- * Copyright (C) 2019 Olybear9 (Bavfalcon9)
- *
+ * 
+ * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
+ *                                                            
  */
 
 declare(strict_types=1);
 
-namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
+namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
 
-use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\NetworkBinaryStream;
+use Bavfalcon9\MultiVersion\Protocols\v1_13_0\types\RuntimeBlockMapping;
 use pocketmine\network\mcpe\NetworkSession;
-use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
-use Bavfalcon9\MultiVersion\Protocols\v1_12_0\types\RuntimeBlockMapping;
 use pocketmine\network\mcpe\protocol\DataPacket;
+use pocketmine\math\Vector3;
+use pocketmine\nbt\NetworkLittleEndianNBTStream;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\tag\StringTag;
+use pocketmine\network\mcpe\NetworkBinaryStream;
+use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
+use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use pocketmine\network\mcpe\protocol\StartGamePacket as PMStartGame;
+use function count;
+use function file_get_contents;
+use function json_decode;
 
 class StartGamePacket extends DataPacket{
-    public const NETWORK_ID = 0x0b;
+
+    public const NETWORK_ID = ProtocolInfo::START_GAME_PACKET;
+
+    public $customTranslation = true;
 
     /** @var string|null */
     private static $blockTableCache = null;
     /** @var string|null */
     private static $itemTableCache = null;
+
     /** @var int */
     public $entityUniqueId;
     /** @var int */
@@ -62,8 +74,8 @@ class StartGamePacket extends DataPacket{
     public $hasAchievementsDisabled = true;
     /** @var int */
     public $time = -1;
-    /** @var bool */
-    public $eduMode = false;
+    /** @var int */
+    public $eduEditionOffer = 0;
     /** @var bool */
     public $hasEduFeaturesEnabled = false;
     /** @var float */
@@ -111,6 +123,8 @@ class StartGamePacket extends DataPacket{
     /** @var bool */
     public $onlySpawnV1Villagers = false;
     /** @var string */
+    public $vanillaVersion = ProtocolInfo::MINECRAFT_VERSION_NETWORK;
+    /** @var string */
     public $levelId = ""; //base64 string, usually the same as world folder name in vanilla
     /** @var string */
     public $worldName;
@@ -118,6 +132,8 @@ class StartGamePacket extends DataPacket{
     public $premiumWorldTemplateId = "";
     /** @var bool */
     public $isTrial = false;
+    /** @var bool */
+    public $isMovementServerAuthoritative = false;
     /** @var int */
     public $currentTick = 0; //only used if isTrial is true
     /** @var int */
@@ -128,7 +144,6 @@ class StartGamePacket extends DataPacket{
     public $blockTable = null;
     /** @var array|null string (name) => int16 (legacyID) */
     public $itemTable = null;
-    public $customTranslation = true; // Multiversion
 
     protected function decodePayload(){
         $this->entityUniqueId = $this->getEntityUniqueId();
@@ -146,7 +161,7 @@ class StartGamePacket extends DataPacket{
         $this->getBlockPosition($this->spawnX, $this->spawnY, $this->spawnZ);
         $this->hasAchievementsDisabled = $this->getBool();
         $this->time = $this->getVarInt();
-        $this->eduMode = $this->getBool();
+        $this->eduEditionOffer = $this->getVarInt();
         $this->hasEduFeaturesEnabled = $this->getBool();
         $this->rainLevel = $this->getLFloat();
         $this->lightningLevel = $this->getLFloat();
@@ -169,10 +184,12 @@ class StartGamePacket extends DataPacket{
         $this->isFromWorldTemplate = $this->getBool();
         $this->isWorldTemplateOptionLocked = $this->getBool();
         $this->onlySpawnV1Villagers = $this->getBool();
+        $this->vanillaVersion = $this->getString();
         $this->levelId = $this->getString();
         $this->worldName = $this->getString();
         $this->premiumWorldTemplateId = $this->getString();
         $this->isTrial = $this->getBool();
+        $this->isMovementServerAuthoritative = $this->getBool();
         $this->currentTick = $this->getLLong();
         $this->enchantmentSeed = $this->getVarInt();
         $this->blockTable = [];
@@ -207,7 +224,7 @@ class StartGamePacket extends DataPacket{
         $this->putBlockPosition($this->spawnX, $this->spawnY, $this->spawnZ);
         $this->putBool($this->hasAchievementsDisabled);
         $this->putVarInt($this->time);
-        $this->putBool($this->eduMode);
+        $this->putVarInt($this->eduEditionOffer);
         $this->putBool($this->hasEduFeaturesEnabled);
         $this->putLFloat($this->rainLevel);
         $this->putLFloat($this->lightningLevel);
@@ -230,10 +247,12 @@ class StartGamePacket extends DataPacket{
         $this->putBool($this->isFromWorldTemplate);
         $this->putBool($this->isWorldTemplateOptionLocked);
         $this->putBool($this->onlySpawnV1Villagers);
+        $this->putString($this->vanillaVersion);
         $this->putString($this->levelId);
         $this->putString($this->worldName);
         $this->putString($this->premiumWorldTemplateId);
         $this->putBool($this->isTrial);
+        $this->putBool($this->isMovementServerAuthoritative);
         $this->putLLong($this->currentTick);
         $this->putVarInt($this->enchantmentSeed);
         if($this->blockTable === null){
@@ -247,7 +266,7 @@ class StartGamePacket extends DataPacket{
         }
         if($this->itemTable === null){
             if(self::$itemTableCache === null){
-                self::$itemTableCache = self::serializeItemTable(json_decode(file_get_contents(MULTIVERSION_v1_12_0 . '/item_id_map.json'), true));
+                self::$itemTableCache = self::serializeItemTable(json_decode(file_get_contents(MULTIVERSION_v1_13_0 . '/item_id_map.json'), true));
             }
             $this->put(self::$itemTableCache);
         }else{
@@ -257,15 +276,19 @@ class StartGamePacket extends DataPacket{
     }
 
     private static function serializeBlockTable(array $table) : string{
-        $stream = new NetworkBinaryStream();
-        $stream->putUnsignedVarInt(count($table));
+        $states = new ListTag();
         foreach($table as $v){
-            $stream->putString($v["name"]);
-            $stream->putLShort($v["data"]);
-            $stream->putLShort($v["legacy_id"]);
+            $state = new CompoundTag();
+            $state->setTag(new CompoundTag("block", [
+                new StringTag("name", $v["name"]),
+                $v["states"]
+            ]));
+            $state->setShort("id", $v["legacy_id"]);
+            $states->push($state);
         }
+        ($stream = new NetworkLittleEndianNBTStream())->writeTag($states);
 
-        return $stream->getBuffer();
+        return $stream->buffer;
     }
 
     private static function serializeItemTable(array $table) : string{
@@ -283,7 +306,7 @@ class StartGamePacket extends DataPacket{
         return $session->handleStartGame($this);
     }
 
-    public function translateCustomPacket($packet){
+    public function translateCustomPacket(PMStartGame $packet){
         $this->spawnX = $packet->spawnX;
         $this->spawnY = $packet->spawnY;
         $this->spawnZ = $packet->spawnZ;
@@ -301,7 +324,6 @@ class StartGamePacket extends DataPacket{
         $this->difficulty = $packet->difficulty;
         $this->hasAchievementsDisabled = $packet->hasAchievementsDisabled;
         $this->time = $packet->time;
-        $this->eduMode = $packet->eduEditionOffer;
         $this->hasEduFeaturesEnabled = $packet->hasEduFeaturesEnabled;
         $this->rainLevel = $packet->rainLevel;
         $this->lightningLevel = $packet->lightningLevel;

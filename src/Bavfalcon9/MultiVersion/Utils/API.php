@@ -1,5 +1,4 @@
 <?php
-
 /**
  *    ___  ___      _ _   _ _   _               _             
  *    |  \/  |     | | | (_) | | |             (_)            
@@ -14,10 +13,8 @@
 
 declare(strict_types=1);
 
-namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
+namespace Bavfalcon9\MultiVersion\Utils;
 
-use pocketmine\network\mcpe\protocol\DataPacket;
-
-class GenericPacket extends DataPacket {
+interface API {
 
 }

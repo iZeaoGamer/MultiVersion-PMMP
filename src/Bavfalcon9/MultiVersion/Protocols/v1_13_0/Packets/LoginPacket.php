@@ -1,20 +1,20 @@
 <?php
 
 /**
- *    ___  ___      _ _   _ _   _               _             
- *    |  \/  |     | | | (_) | | |             (_)            
- *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __  
- *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \ 
+ *    ___  ___      _ _   _ _   _               _
+ *    |  \/  |     | | | (_) | | |             (_)
+ *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __
+ *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \
  *    | |  | | |_| | | |_| \ \_/ /  __/ |  \__ \ | (_) | | | |
  *    \_|  |_/\__,_|_|\__|_|\___/ \___|_|  |___/_|\___/|_| |_|
- * 
- * Copyright (C) 2019 Olybear9 (Bavfalcon9)                            
- *                                                            
+ *
+ * Copyright (C) 2019 Olybear9 (Bavfalcon9)
+ *
  */
 
 declare(strict_types=1);
 
-namespace Bavfalcon9\MultiVersion\Protocols\v1_12_0\Packets;
+namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
 
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\utils\BinaryStream;
@@ -24,8 +24,8 @@ use pocketmine\network\mcpe\protocol\LoginPacket as PMLogin;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 
 class LoginPacket extends PMLogin{
-    public const NETWORK_ID = 0x01;
 
+    public const NETWORK_ID = 0x01;
     public const EDITION_POCKET = 0;
 
     /** @var string */
@@ -50,6 +50,7 @@ class LoginPacket extends PMLogin{
     public $clientDataJwt;
     /** @var array decoded payload of the clientData JWT */
     public $clientData = [];
+
     /**
      * This field may be used by plugins to bypass keychain verification. It should only be used for plugins such as
      * Specter where passing verification would take too much time and not be worth it.
@@ -68,7 +69,7 @@ class LoginPacket extends PMLogin{
 
     protected function decodePayload(){
         $this->protocol = ((unpack("N", $this->get(4))[1] << 32 >> 32));
-        $this->protocol = ProtocolInfo::CURRENT_PROTOCOL; // This is a 1.12 hack?
+        $this->protocol = ProtocolInfo::CURRENT_PROTOCOL; // Hack to allow a bypass
         if($this->protocol !== ProtocolInfo::CURRENT_PROTOCOL){
             if($this->protocol > 0xffff){ //guess MCPE <= 1.1
                 $this->offset -= 6;
@@ -91,7 +92,7 @@ class LoginPacket extends PMLogin{
 
     protected function decodeConnectionRequest() : void{
         $buffer = new BinaryStream($this->getString());
-        $this->chainData = json_decode($buffer->get($buffer->getLInt()), \true);
+        $this->chainData = json_decode($buffer->get($buffer->getLInt()), true);
         foreach($this->chainData["chain"] as $chain){
             $webtoken = Utils::decodeJWT($chain);
             if(isset($webtoken["extraData"])){
@@ -122,5 +123,14 @@ class LoginPacket extends PMLogin{
 
     public function handle(NetworkSession $session) : bool{
         return $session->handleLogin($this);
+    }
+
+    public function translateLogin($packet){
+        // $this->protocol =  Why did i do this?
+        $this->protocol = ProtocolInfo::CURRENT_PROTOCOL; // required to assign a temporary bypass through the server.
+        $this->clientData = $packet->clientData;
+        $this->clientData['SkinGeometry'] = $packet->clientData['SkinGeometryData'];
+
+        return $this;
     }
 }
