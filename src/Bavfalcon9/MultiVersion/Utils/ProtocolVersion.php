@@ -59,7 +59,7 @@ class ProtocolVersion {
         if (isset($this->$packetListeners[$listener->getName()])) {
             return false;
         } else {
-            $this->addPacketListeners[$listener->getName()] = $listener;
+            $this->packetListeners[$listener->getName()] = $listener;
             return true;
         }
     }

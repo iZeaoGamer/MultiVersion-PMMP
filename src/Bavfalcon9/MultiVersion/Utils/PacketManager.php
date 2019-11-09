@@ -115,7 +115,7 @@ class PacketManager {
             $protocol = $this->oldplayers[$player->getName()];
             $protocol = $this->registered[$protocol];
             $pkN = $protocol->getPacketName($nId);
-            $protocol->changePacket($pkN, $packet, 'RECIEVE');
+            $protocol->changePacket($pkN, $packet, 'RECEIVE');
             $this->handleOldReceived($packet, $player);
             $event->setCancelled();
         }
