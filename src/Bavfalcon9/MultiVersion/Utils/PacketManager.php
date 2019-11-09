@@ -126,6 +126,10 @@ class PacketManager {
         $packet = $event->getPacket();
         $player = $event->getPlayer();
         $nId = $packet::NETWORK_ID;
+        if (!isset($this->oldplayers[$player->getName()])) {
+            return;
+        }
+
         if (isset($this->queue[$player->getName()]) and in_array($nId, $this->queue[$player->getName()])) {
             array_splice($this->queue[$player->getName()], array_search($nId, $this->queue[$player->getName()]));
         } else {
