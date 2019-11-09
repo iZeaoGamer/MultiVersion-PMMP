@@ -89,7 +89,7 @@ class ProtocolVersion {
         
         if (!$oldPacket instanceof DataPacket) {
             // I need to change this to be more dynamic
-            echo "[MULTIVERSION]: Packet change requested on non datapacket typing. {$oldPacket->getName()} | " . $oldPacket::NETWORK_ID . "\n";
+            echo "[MULTIVERSION]: Packet change requested on non DataPacket typing. {$oldPacket->getName()} | " . $oldPacket::NETWORK_ID . "\n";
         }
 
         if ($pk instanceof CustomTranslator) {

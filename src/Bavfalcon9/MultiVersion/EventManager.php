@@ -77,8 +77,11 @@ class EventManager implements Listener {
             ]);
             $newVersion = $this->packetManager->registerProtocol($newVersion);
             define('MULTIVERSION_v1_12_0', $this->plugin->getDataFolder().'v1_12_0');
-            if (!$newVersion) MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.12.x");
-            else MainLogger::getLogger()->info("§aLoaded support for: 1.12.x");
+            if (!$newVersion) {
+                MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.12.x");
+            } else {
+                MainLogger::getLogger()->info("§aLoaded support for: 1.12.x");
+            }
         }
     }
 

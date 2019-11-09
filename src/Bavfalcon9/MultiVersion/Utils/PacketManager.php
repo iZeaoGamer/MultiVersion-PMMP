@@ -126,7 +126,6 @@ class PacketManager {
         $packet = $event->getPacket();
         $player = $event->getPlayer();
         $nId = $packet::NETWORK_ID;
-        if (!isset($this->oldplayers[$player->getName()])) return;
         if (isset($this->queue[$player->getName()]) and in_array($nId, $this->queue[$player->getName()])) {
             array_splice($this->queue[$player->getName()], array_search($nId, $this->queue[$player->getName()]));
         } else {
@@ -138,8 +137,9 @@ class PacketManager {
             $protocol = $this->registered[$protocol];
             $pkN = $protocol->getPacketName($nId);
             $success = $protocol->changePacket($pkN, $packet, 'SENT');
-            if (!$success) {
+            if ($success === null) {
                 $this->plugin->getLogger()->critical("Tried to send an unknown packet[$nId] to player: {$player->getName()}");
+
                 return;
             }
 
