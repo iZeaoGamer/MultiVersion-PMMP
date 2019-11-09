@@ -135,7 +135,9 @@ class PacketManager {
             if (!isset($this->queue[$player->getName()])) {
                 $this->queue[$player->getName()] = [];
             }
-            if (!isset($this->oldplayers[$player->getName()])) return;
+            if (!isset($this->oldplayers[$player->getName()])) {
+                return;
+            }
 
             $protocol = $this->oldplayers[$player->getName()];
             $protocol = $this->registered[$protocol];
