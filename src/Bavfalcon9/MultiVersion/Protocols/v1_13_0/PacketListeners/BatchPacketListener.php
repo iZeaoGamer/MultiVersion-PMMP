@@ -2,8 +2,8 @@
 
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\PacketListeners;
 
-use Bavfalcon9\MultiVersion\Listener;
-use Bavfalcon9\MultiVersion\PacketListener;
+use Bavfalcon9\MultiVersion\Utils\Listener;
+use Bavfalcon9\MultiVersion\Utils\PacketListener;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 
 class BatchPacketListenerTest extends PacketListener implements Listener {
