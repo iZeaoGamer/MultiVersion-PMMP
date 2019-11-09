@@ -17,6 +17,7 @@ namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets;
 
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SerializedImage;
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\Skin;
+use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Entity\SkinAnimation;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\utils\UUID;
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -66,7 +67,7 @@ class PlayerSkinPacket extends DataPacket{
 		return new Skin($skinId, $skinResourcePatch, $skinData, $animations, $capeData, $geometryData, $animationData, $premium, $persona, $capeOnClassic, $capeId);
     }
 
-    private function putSkin($skin) {
+    private function putSkin(Skin $skin) {
         $this->putString($skin->getSkinId());
 		$this->putString($skin->getSkinResourcePatch());
 		$this->putImage($skin->getSkinData());
@@ -97,6 +98,7 @@ class PlayerSkinPacket extends DataPacket{
 		$width = $this->getLInt();
 		$height = $this->getLInt();
 		$data = $this->getString();
+
 		return new SerializedImage($width, $height, $data);
 	}
 }

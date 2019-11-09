@@ -150,5 +150,5 @@ class PlayerListPacket extends PMListPacket{
 		};
 
 		return $this;
-	}
+    }
 }

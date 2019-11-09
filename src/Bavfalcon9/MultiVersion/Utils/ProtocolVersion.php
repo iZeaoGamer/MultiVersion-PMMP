@@ -61,20 +61,25 @@ class ProtocolVersion {
     }
 
     public function getPacketName(Float $id): ?String {
-        foreach ($this->protocolPackets as $name=>$pid) {
-            if ($id == $pid) return $name;
-            else continue;
+        foreach ($this->protocolPackets as $name => $pid) {
+            if ($id == $pid) {
+                return $name;
+            }
         }
 
-        return ''.$id;
+        return "$id";
     }
 
-    public function changePacket(String &$name, &$oldPacket, String $type='Sent') {
-        if (!isset($this->protocolPackets[$name]) && $this->restricted === true) return null;
+    public function changePacket(String &$name, &$oldPacket, String $type = 'Sent') {
+        if (!isset($this->protocolPackets[$name]) && $this->restricted === true) {
+            return null;
+        }
+
         if (!isset($this->protocolPackets[$name])) {
             if (self::DEVELOPER === true) {
                 MainLogger::getLogger()->info("§c[MultiVersion] DEBUG:§e Packet §8[§f {$oldPacket->getName()} §8| §f".$oldPacket::NETWORK_ID."§8]§e requested a change but no change supported §a{$type}§e.");
             }
+
             return $oldPacket;
         }
 
@@ -86,11 +91,14 @@ class ProtocolVersion {
             echo "[MULTIVERSION]: Packet change requested on non datapacket typing. {$oldPacket->getName()} | " . $oldPacket::NETWORK_ID . "\n";
         }
 
-        if (isset($pk->customTranslation)) $pk = $pk->translateCustomPacket($oldPacket);
+        if (isset($pk->customTranslation)) {
+            $pk = $pk->translateCustomPacket($oldPacket);
+        }
 
         $pk->setBuffer($oldPacket->buffer, $oldPacket->offset);
         $oldPacket = $pk;
         MainLogger::getLogger()->info("§6[MultiVersion] DEBUG: Modified Packet §8[§f {$oldPacket->getName()} §8| §f".$oldPacket::NETWORK_ID."§8]§6 §a{$type}§6.");
+
         return $oldPacket;
     }
 
@@ -102,9 +110,8 @@ class ProtocolVersion {
             $pk = new $pk;
             $pk->translateLogin($packet);
             $pk->setBuffer($packet->buffer, $packet->offset);
-            $packet = $pk;
 
-            return $packet;
+            return $pk;
         }
     }
 }

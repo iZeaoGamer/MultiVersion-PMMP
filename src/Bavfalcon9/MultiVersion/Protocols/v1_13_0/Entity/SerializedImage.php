@@ -32,6 +32,7 @@ class SerializedImage{
 		if(strlen($data) !== ($width * $height) * 4) {
 			$width = $height = (int) ceil(sqrt(strlen($data) / 4));
 		}
+
 		$this->width = $width;
 		$this->height = $height;
 		$this->data = $data;

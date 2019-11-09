@@ -51,13 +51,18 @@ class EventManager implements Listener {
                 "LoginPacket" => 0x01,
                 "StartGamePacket" => 0x0b,
                 "PlayerListPacket" => 0x3f,
-                "PlayerSkinPacket" => 0x5d
+                "PlayerSkinPacket" => 0x5d,
+                "UpdateBlockPacket" => 0x15
             ]);
             $newVersion = $this->packetManager->registerProtocol($newVersion);
             define('MULTIVERSION_v1_13_0', $this->plugin->getDataFolder().'v1_13_0');
-            if (!$newVersion) MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.13.x");
-            else MainLogger::getLogger()->info("§aLoaded support for: 1.13.x");
+            if (!$newVersion) {
+                MainLogger::getLogger()->critical("[MULTIVERSION]: Failed to add version: 1.13.x");
+            } else {
+                MainLogger::getLogger()->info("§aLoaded support for: 1.13.x");
+            }
         }
+
         if ($this->plugin->server_version === '1.13.0') {
             // 1.12 support on MCPE 1.13
             $newVersion = new ProtocolVersion(ProtocolVersion::VERSIONS['1.12.0'], '1.12.0', false);
@@ -68,7 +73,7 @@ class EventManager implements Listener {
                 "PlayerListPacket" => 0x3f,
                 "PlayerSkinPacket" => 0x5d,
                 "ExplodePacket" => 0x17,
-                "ResourcePackDataInfoPacket" => 0x52,
+                "ResourcePackDataInfoPacket" => 0x52
             ]);
             $newVersion = $this->packetManager->registerProtocol($newVersion);
             define('MULTIVERSION_v1_12_0', $this->plugin->getDataFolder().'v1_12_0');

@@ -26,6 +26,7 @@ use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\NetworkBinaryStream;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use pocketmine\network\mcpe\protocol\StartGamePacket as PMStartGame;
 use function count;
 use function file_get_contents;
 use function json_decode;
@@ -310,7 +311,7 @@ class StartGamePacket extends DataPacket{
 		return $session->handleStartGame($this);
     }
 
-	public function translateCustomPacket($packet) {
+	public function translateCustomPacket(PMStartGame $packet) {
 		$this->spawnX = $packet->spawnX;
 		$this->spawnY = $packet->spawnY;
 		$this->spawnZ = $packet->spawnZ;
@@ -328,7 +329,6 @@ class StartGamePacket extends DataPacket{
 		$this->difficulty = $packet->difficulty;
 		$this->hasAchievementsDisabled = $packet->hasAchievementsDisabled;
 		$this->time = $packet->time;
-		$this->eduEditionOffer = $packet->eduMode;
 		$this->hasEduFeaturesEnabled = $packet->hasEduFeaturesEnabled;
 		$this->rainLevel = $packet->rainLevel;
 		$this->lightningLevel = $packet->lightningLevel;

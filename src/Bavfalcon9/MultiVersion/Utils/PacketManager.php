@@ -112,8 +112,6 @@ class PacketManager {
 
         if (isset($this->queue[$player->getName()]) and in_array($nId, $this->queue[$player->getName()])) {
             array_splice($this->queue[$player->getName()], array_search($nId, $this->queue[$player->getName()]));
-
-            return;
         } else {
             array_push($this->queue[$player->getName()], $nId);
             $protocol = $this->oldplayers[$player->getName()];
@@ -122,8 +120,6 @@ class PacketManager {
             $protocol->changePacket($pkN, $packet, 'RECIEVE');
             $this->handleOldReceived($packet, $player);
             $event->setCancelled();
-
-            return;
         }
     }
 
@@ -134,7 +130,6 @@ class PacketManager {
         if (!isset($this->oldplayers[$player->getName()])) return;
         if (isset($this->queue[$player->getName()]) and in_array($nId, $this->queue[$player->getName()])) {
             array_splice($this->queue[$player->getName()], array_search($nId, $this->queue[$player->getName()]));
-            return;
         } else {
             if (!isset($this->queue[$player->getName()])) {
                 $this->queue[$player->getName()] = [];
@@ -145,17 +140,14 @@ class PacketManager {
             $pkN = $protocol->getPacketName($nId);
             $success = $protocol->changePacket($pkN, $packet, 'SENT');
             if (!$success) {
-                $this->plugin->getLogger()->critical("Tried to send an unknown packet[{$nId}] to player: {$player->getName()}");
+                $this->plugin->getLogger()->critical("Tried to send an unknown packet[$nId] to player: {$player->getName()}");
                 return;
             }
 
             array_push($this->queue[$player->getName()], $nId);
             $player->sendDataPacket($packet);
             $event->setCancelled();
-
-            return;
         }
-
     }
 
     private function handleOldReceived(DataPacket $packet, Player $player) {

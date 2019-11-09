@@ -76,6 +76,7 @@ class LoginPacket extends PMLogin{
 				$this->protocol = ((unpack("N", $this->get(4))[1] << 32 >> 32));
 			}
 		}
+
 		try{
 			$this->decodeConnectionRequest();
 		}catch(\Throwable $e){
@@ -109,6 +110,7 @@ class LoginPacket extends PMLogin{
 					$this->xuid = $webtoken["extraData"]["XUID"];
 				}
 			}
+
 			if(isset($webtoken["identityPublicKey"])){
 				$this->identityPublicKey = $webtoken["identityPublicKey"];
 			}
@@ -127,7 +129,6 @@ class LoginPacket extends PMLogin{
 	public function handle(NetworkSession $session) : bool{
 		return $session->handleLogin($this);
     }
-
 
     public function translateLogin($packet) {
         // $this->protocol =  Why did i do this?
