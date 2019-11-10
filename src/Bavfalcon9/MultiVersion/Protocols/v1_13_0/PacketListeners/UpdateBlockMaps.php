@@ -1,5 +1,5 @@
 <?php
-
+// see https://github.com/Olybear9/MultiVersion-PMMP/wiki/Packet-Listeners
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\PacketListeners;
 
 use Bavfalcon9\MultiVersion\Utils\Listener;
@@ -12,11 +12,11 @@ class UpdateBlockMaps extends PacketListener implements Listener {
     }
 
     public function onPacketCheck(&$packet): Bool {
-
-        return isset);
+        if (strlen($packet->payload) <= 2000) return false;
+        return true;
     }
 
     public function onPacketMatch(&$packet): Void {
-
+        /* This is the block times mapping packet */
     }
 }

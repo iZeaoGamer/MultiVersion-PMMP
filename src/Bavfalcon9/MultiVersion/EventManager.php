@@ -55,7 +55,7 @@ class EventManager implements Listener {
                 "UpdateBlockPacket" => 0x15
             ]);
             $newVersion->setListeners([
-                'UpdateBlockMaps' // k and its really fucking spammy
+                'UpdateBlockMaps'
             ]);
             $newVersion = $this->packetManager->registerProtocol($newVersion);
             define('MULTIVERSION_v1_13_0', $this->plugin->getDataFolder().'v1_13_0');
