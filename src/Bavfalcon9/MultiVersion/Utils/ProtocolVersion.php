@@ -20,6 +20,7 @@ use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
 use Bavfalcon9\MutliVersion\Utils\API;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\utils\MainLogger;
+use pocketmine\Server;
 
 class ProtocolVersion {
     public const DEVELOPER = true; // set to true for debug
@@ -40,13 +41,14 @@ class ProtocolVersion {
      * @param String $MCPE
      * @param bool   $restrict
      */
-    public function __construct(int $protocol, String $MCPE, Bool $restrict=false) {
+    public function __construct(int $protocol, String $MCPE, Bool $restrict=false, Array $listeners=[]) {
         $fixedMCPE = 'v'.implode('_', explode('.', $MCPE));
         $this->protocol = $protocol;
         $this->dirPath = "Bavfalcon9\\MultiVersion\\Protocols\\".$fixedMCPE."\\";
-        $this->dir = "Bavfalcon9\\MultiVersion\\Protocols\\".$fixedMCPE."\\Packets\\";
+        $this->dir = $this->dirPath . "Packets\\";
         $this->restricted = $restrict;
         $this->minecraftVersion = $MCPE;
+        $this->wantedListeners = $listeners;
         $this->registerListeners();
     }
 
@@ -54,9 +56,14 @@ class ProtocolVersion {
         $this->protocolPackets = $packets;
     }
 
+    public function setListeners(Array $listeners) {
+        $this->wantedListeners = $listeners;
+        $this->registerListeners();
+    }
+
     public function addPacketListener(PacketListener $listener): Bool {
         if (!$listener instanceof Listener) return false;
-        if (isset($this->$packetListeners[$listener->getName()])) {
+        if (isset($this->packetListeners[$listener->getName()])) {
             return false;
         } else {
             $this->packetListeners[$listener->getName()] = $listener;
@@ -145,11 +152,7 @@ class ProtocolVersion {
     }
 
     public function registerListeners() {
-        if (!file_exists($this->dirPath . 'PacketListeners')) return;
-        $listeners = scandir($this->dirPath . 'PacketListeners');
-        foreach ($listeners as $lsn) {
-            if ($lsn === '.' || $lsn === '..') continue;
-
+        foreach ($this->wantedListeners as $lsn) {
             $listener = $this->dirPath . "PacketListeners\\$lsn";
             $listener = new $listener;
             $this->addPacketListener($listener);

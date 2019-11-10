@@ -1,7 +1,6 @@
 <?php
 
 namespace Bavfalcon9\MultiVersion\Utils;
-$registered = 0;
 
 class PacketListener {
     /** @var Int */
@@ -13,9 +12,11 @@ class PacketListener {
     /** @var String */
     private $packetName;
 
+    public static $listeners = 0;
+
     public function __construct(String $packetName, Int $networkId) {
-        $registered++;
-        $this->registered = $registered;
+        self::$listeners++;
+        $this->registered = self::$listeners;
         $this->networkId = $networkId;
         $this->packetName = $packetName;
     }

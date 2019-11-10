@@ -30,7 +30,7 @@ class Main extends PluginBase {
             $this->getLogger()->critical("Server version:". $this->server_version . "not supported by multiversion.");
             $this->getServer()->getPluginManager()->disablePlugin($this);
         }
-
+        define('MultiVersionFile', $this->getFile());
         $this->EventManager = new EventManager($this);
         $this->getServer()->getPluginManager()->registerEvents($this->EventManager, $this);
         $this->saveAllResources();
