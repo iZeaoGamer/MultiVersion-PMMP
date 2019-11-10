@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Bavfalcon9\MultiVersion\Utils;
 
 class API {
+
     public static function packetHasField($packet, $fieldName): Bool {
         return isset($packet->{$fieldName});
     }

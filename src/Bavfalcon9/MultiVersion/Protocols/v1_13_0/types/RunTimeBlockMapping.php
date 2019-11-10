@@ -36,8 +36,8 @@ final class RuntimeBlockMapping{
     private static $legacyToRuntimeMap = [];
     /** @var int[] */
     private static $runtimeToLegacyMap = [];
-    /** @var mixed[] */
-    private static $bedrockKnownStates;
+    /** @var mixed[]|null */
+    private static $bedrockKnownStates = null;
 
     private function __construct(){
         //NOOP
@@ -73,6 +73,12 @@ final class RuntimeBlockMapping{
         }
     }
 
+    private static function lazyInit() : void{
+        if(self::$bedrockKnownStates === null){
+            self::init();
+        }
+    }
+
     /**
      * Randomizes the order of the runtimeID table to prevent plugins relying on them.
      * Plugins shouldn't use this stuff anyway, but plugin devs have an irritating habit of ignoring what they
@@ -98,6 +104,7 @@ final class RuntimeBlockMapping{
      * @return int
      */
     public static function toStaticRuntimeId(int $id, int $meta = 0) : int{
+        self::lazyInit();
         /*
          * try id+meta first
          * if not found, try id+0 (strip meta)
@@ -112,6 +119,7 @@ final class RuntimeBlockMapping{
      * @return int[] [id, meta]
      */
     public static function fromStaticRuntimeId(int $runtimeId) : array{
+        self::lazyInit();
         $v = self::$runtimeToLegacyMap[$runtimeId];
 
         return [$v >> 4, $v & 0xf];
@@ -126,7 +134,7 @@ final class RuntimeBlockMapping{
      * @return array
      */
     public static function getBedrockKnownStates() : array{
+        self::lazyInit();
         return self::$bedrockKnownStates;
     }
 }
-RuntimeBlockMapping::init();

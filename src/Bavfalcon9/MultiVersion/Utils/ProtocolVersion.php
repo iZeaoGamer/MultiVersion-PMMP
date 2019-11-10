@@ -107,10 +107,15 @@ class ProtocolVersion {
                 }
             }
         }
-        if ($modified) return $oldPacket;
+
+        if ($modified) {
+            return $oldPacket;
+        }
+
         if (!isset($this->protocolPackets[$name]) && $this->restricted === true) {
             return null;
         }
+
         if (!isset($this->protocolPackets[$name])) {
             if (self::DEVELOPER === true) {
                 MainLogger::getLogger()->info("§c[MultiVersion] DEBUG:§e Packet §8[§f {$oldPacket->getName()} §8| §f".$oldPacket::NETWORK_ID."§8]§e requested a change but no change supported §a{$type}§e.");

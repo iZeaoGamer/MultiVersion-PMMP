@@ -75,9 +75,14 @@ class UpdateBlockPacket extends DataPacket implements CustomTranslator{
      *
      * @return $this
      */
-    public function translateCustomPacket($packet) {
+    public function translateCustomPacket(&$packet) {
+        $this->x = $packet->x;
+        $this->y = $packet->y;
+        $this->z = $packet->z;
         list($id, $meta) = PMRuntimeBlockMapping::fromStaticRuntimeId($packet->blockRuntimeId);
         $this->blockRuntimeId = RuntimeBlockMapping::toStaticRuntimeId($id, $meta);
+        $this->flags = $packet->flags;
+        $this->dataLayerId = $packet->dataLayerId;
 
         return $this;
     }

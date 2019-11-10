@@ -1,5 +1,19 @@
 <?php
 
+/**
+ *    ___  ___      _ _   _ _   _               _
+ *    |  \/  |     | | | (_) | | |             (_)
+ *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __
+ *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \
+ *    | |  | | |_| | | |_| \ \_/ /  __/ |  \__ \ | (_) | | | |
+ *    \_|  |_/\__,_|_|\__|_|\___/ \___|_|  |___/_|\___/|_| |_|
+ *
+ * Copyright (C) 2019 Olybear9 (Bavfalcon9)
+ *
+ */
+
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Utils;
 
 class PacketListener {
@@ -12,7 +26,7 @@ class PacketListener {
     /** @var String */
     private $packetName;
 
-    public static $listeners = 0;
+    private static $listeners = 0;
 
     public function __construct(String $packetName, Int $networkId) {
         self::$listeners++;
@@ -34,6 +48,6 @@ class PacketListener {
     }
 
     public static function getAmount(): int {
-        return $registered;
+        return self::$listeners;
     }
 }

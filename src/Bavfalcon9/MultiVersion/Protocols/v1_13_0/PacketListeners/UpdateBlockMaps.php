@@ -1,22 +1,78 @@
 <?php
+/**
+ *    ___  ___      _ _   _ _   _               _
+ *    |  \/  |     | | | (_) | | |             (_)
+ *    | .  . |_   _| | |_ _| | | | ___ _ __ ___ _  ___  _ __
+ *    | |\/| | | | | | __| | | | |/ _ \ '__/ __| |/ _ \| '_ \
+ *    | |  | | |_| | | |_| \ \_/ /  __/ |  \__ \ | (_) | | | |
+ *    \_|  |_/\__,_|_|\__|_|\___/ \___|_|  |___/_|\___/|_| |_|
+ *
+ * Copyright (C) 2019 Olybear9 (Bavfalcon9)
+ *
+ */
+
 // see https://github.com/Olybear9/MultiVersion-PMMP/wiki/Packet-Listeners
+
+declare(strict_types=1);
+
 namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\PacketListeners;
 
+use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets\UpdateBlockPacket;
+use pocketmine\network\mcpe\protocol\UpdateBlockPacket as PMUpdateBlock;
 use Bavfalcon9\MultiVersion\Utils\Listener;
 use Bavfalcon9\MultiVersion\Utils\PacketListener;
-use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\BatchPacket;
+use pocketmine\network\mcpe\protocol\PacketPool;
+
 class UpdateBlockMaps extends PacketListener implements Listener {
+
     public function __construct() {
         parent::__construct('BatchPacket', BatchPacket::NETWORK_ID);
     }
 
+    /**
+     * @param BatchPacket $packet
+     *
+     * @return bool
+     */
     public function onPacketCheck(&$packet): Bool {
-        if (strlen($packet->payload) <= 2000) return false;
-        return true;
+        foreach($packet->getPackets() as $buf){
+            $pk = PacketPool::getPacket($buf);
+            if($pk instanceof PMUpdateBlock){
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public function onPacketMatch(&$packet): Void {
-        /* This is the block times mapping packet */
+    /**
+     * @param BatchPacket $packet
+     *
+     * @return void
+     */
+    public function onPacketMatch(&$packet) : Void {
+        foreach($packet->getPackets() as $buf){
+            $pk = PacketPool::getPacket($buf);
+            if($pk instanceof PMUpdateBlock){
+                $pk = $this->decodeUpdateBlockPacketPayload($pk);
+                $newPk = "Bavfalcon9\\MultiVersion\\Protocols\\v1_13_0\\Packets\\UpdateBlockPacket";
+                /** @var UpdateBlockPacket $newPk */
+                $newPk = new $newPk;
+                $pk = $newPk->translateCustomPacket($pk);
+                $packet->payload = str_replace($buf, $pk->buffer, $packet->payload);
+            }
+        }
+
+        return;
+    }
+
+    private function decodeUpdateBlockPacketPayload(PMUpdateBlock $packet){
+        $packet->getBlockPosition($packet->x, $packet->y, $packet->z);
+        $packet->blockRuntimeId = $packet->getUnsignedVarInt();
+        $packet->flags = $packet->getUnsignedVarInt();
+        $packet->dataLayerId = $packet->getUnsignedVarInt();
+
+        return $packet;
     }
 }
