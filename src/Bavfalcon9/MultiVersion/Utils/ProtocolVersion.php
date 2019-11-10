@@ -69,9 +69,6 @@ class ProtocolVersion {
     }
 
     public function addPacketListener(PacketListener $listener): Bool {
-        if (!$listener instanceof PacketListener) {
-            return false;
-        }
         if (isset($this->packetListeners[$listener->getName()])) {
             return false;
         } else {
