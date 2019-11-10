@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace Bavfalcon9\MultiVersion\Utils;
 
-class PacketListener {
+abstract class PacketListener {
     /** @var Int */
     private $networkId;
     /** @var String*/
@@ -50,4 +50,8 @@ class PacketListener {
     public static function getAmount(): int {
         return self::$listeners;
     }
+
+    abstract public function onPacketCheck(&$packet): Bool;
+
+    abstract public function onPacketMatch(&$packet): Void;
 }

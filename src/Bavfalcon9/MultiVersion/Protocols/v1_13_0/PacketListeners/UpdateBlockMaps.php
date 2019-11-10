@@ -19,12 +19,11 @@ namespace Bavfalcon9\MultiVersion\Protocols\v1_13_0\PacketListeners;
 
 use Bavfalcon9\MultiVersion\Protocols\v1_13_0\Packets\UpdateBlockPacket;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket as PMUpdateBlock;
-use Bavfalcon9\MultiVersion\Utils\Listener;
 use Bavfalcon9\MultiVersion\Utils\PacketListener;
 use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\PacketPool;
 
-class UpdateBlockMaps extends PacketListener implements Listener {
+class UpdateBlockMaps extends PacketListener {
 
     public function __construct() {
         parent::__construct('BatchPacket', BatchPacket::NETWORK_ID);

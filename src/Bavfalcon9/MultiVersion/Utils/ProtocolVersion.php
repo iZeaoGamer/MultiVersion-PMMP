@@ -17,10 +17,8 @@ declare(strict_types=1);
 namespace Bavfalcon9\MultiVersion\Utils;
 
 use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
-use Bavfalcon9\MutliVersion\Utils\API;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\utils\MainLogger;
-use pocketmine\Server;
 
 class ProtocolVersion {
     public const DEVELOPER = true; // set to true for debug
@@ -28,20 +26,29 @@ class ProtocolVersion {
         '1.12.0' => 361,
         '1.13.0' => 388
     ];
+
+    /** @var int */
     private $protocol;
+    /** @var array */
     private $protocolPackets = [];
+    /** @var bool */
     private $restricted = false;
+    /** @var string */
     private $dir = '';
+    /** @var string */
     private $dirPath = '';
+    /** @var string */
     private $minecraftVersion = '1.13.0';
+    /** @var array */
     private $packetListeners = [];
 
     /**
-     * @param int  $protocol
+     * @param int    $protocol
      * @param String $MCPE
      * @param bool   $restrict
+     * @param array  $listeners
      */
-    public function __construct(int $protocol, String $MCPE, Bool $restrict=false, Array $listeners=[]) {
+    public function __construct(int $protocol, String $MCPE, Bool $restrict = false, Array $listeners = []) {
         $fixedMCPE = 'v'.implode('_', explode('.', $MCPE));
         $this->protocol = $protocol;
         $this->dirPath = "Bavfalcon9\\MultiVersion\\Protocols\\".$fixedMCPE."\\";
@@ -62,7 +69,9 @@ class ProtocolVersion {
     }
 
     public function addPacketListener(PacketListener $listener): Bool {
-        if (!$listener instanceof Listener) return false;
+        if (!$listener instanceof PacketListener) {
+            return false;
+        }
         if (isset($this->packetListeners[$listener->getName()])) {
             return false;
         } else {
