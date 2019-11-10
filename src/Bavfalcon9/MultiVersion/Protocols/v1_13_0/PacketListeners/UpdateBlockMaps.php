@@ -57,10 +57,13 @@ class UpdateBlockMaps extends PacketListener {
                 $newPk = "Bavfalcon9\\MultiVersion\\Protocols\\v1_13_0\\Packets\\UpdateBlockPacket";
                 /** @var UpdateBlockPacket $newPk */
                 $newPk = new $newPk;
+
                 $pk = $this->decodeUpdateBlockPacketPayload($pk);
                 $pk = $newPk->translateCustomPacket($pk);
                 $pk = $this->encodeUpdateBlockPacketPayload($pk);
-                $packet->payload = str_replace($buf, $pk->buffer, $packet->payload);
+
+                $newPayload = str_replace(strlen($buf) . $buf, $pk->buffer, $packet->payload);
+                $packet->setBuffer($newPayload, $packet->offset);
             }
         }
 
