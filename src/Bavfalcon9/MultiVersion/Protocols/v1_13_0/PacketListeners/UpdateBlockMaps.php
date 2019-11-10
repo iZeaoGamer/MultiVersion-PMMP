@@ -54,16 +54,26 @@ class UpdateBlockMaps extends PacketListener {
         foreach($packet->getPackets() as $buf){
             $pk = PacketPool::getPacket($buf);
             if($pk instanceof PMUpdateBlock){
-                $pk = $this->decodeUpdateBlockPacketPayload($pk);
                 $newPk = "Bavfalcon9\\MultiVersion\\Protocols\\v1_13_0\\Packets\\UpdateBlockPacket";
                 /** @var UpdateBlockPacket $newPk */
                 $newPk = new $newPk;
+                $pk = $this->decodeUpdateBlockPacketPayload($pk);
                 $pk = $newPk->translateCustomPacket($pk);
+                $pk = $this->encodeUpdateBlockPacketPayload($pk);
                 $packet->payload = str_replace($buf, $pk->buffer, $packet->payload);
             }
         }
 
         return;
+    }
+
+    private function encodeUpdateBlockPacketPayload(UpdateBlockPacket $packet){
+        $packet->putBlockPosition($packet->x, $packet->y, $packet->z);
+        $packet->putUnsignedVarInt($packet->blockRuntimeId);
+        $packet->putUnsignedVarInt($packet->flags);
+        $packet->putUnsignedVarInt($packet->dataLayerId);
+
+        return $packet;
     }
 
     private function decodeUpdateBlockPacketPayload(PMUpdateBlock $packet){
