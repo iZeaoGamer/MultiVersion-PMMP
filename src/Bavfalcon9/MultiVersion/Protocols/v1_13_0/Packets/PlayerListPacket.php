@@ -154,12 +154,33 @@ class PlayerListPacket extends DataPacket implements CustomTranslator{
      *
      * @return $this
      */
-    public function translateCustomPacket($packet){
+    public function translateCustomPacket(&$packet){
         $this->type = $packet->type;
-        foreach($packet->entries as $entry){
-            $entry->skin = Skin::null();
+        foreach($packet->entries as $key=>$entry){
+            if ($entry->username === NULL) {
+                unset($packet->entries[$key]); // prevents client crashing
+                continue;
+            }
+            if (!isset($entry->skin->capeId)) $packet->entries[$key]->skin = $this->convertOldToNewSkin($entry->skin);
         };
-
         return $this;
+    }
+
+    private function convertOldToNewSkin($skin) {
+        if (!$skin) return Skin::null();
+        $skinId = $skin->getSkinId();
+        $skinData = SerializedImage::fromLegacy($skin->getSkinData());
+        $capeData = SerializedImage::fromLegacy($skin->getCapeData());
+        $geometryData = $skin->getGeometryData();
+        $geometryName = $skin->getGeometryName();
+        return new Skin(
+            $skinId,
+            'MultiVersion_v1.0.0',
+            $skinData,
+            [],
+            $capeData,
+            $geometryData,
+            ''
+        );
     }
 }

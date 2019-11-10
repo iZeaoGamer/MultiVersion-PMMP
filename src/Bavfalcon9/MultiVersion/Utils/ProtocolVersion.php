@@ -121,17 +121,17 @@ class ProtocolVersion {
 
         $pk = $this->dir . $name;
         $pk = new $pk;
-        
+        $pk->setBuffer($oldPacket->buffer, $oldPacket->offset);
+
         if (!$oldPacket instanceof DataPacket) {
             // I need to change this to be more dynamic
-            echo "[MULTIVERSION]: Packet change requested on non DataPacket typing. {$oldPacket->getName()} | " . $oldPacket::NETWORK_ID . "\n";
+            MainLogger::getLogger()->info("§8[MULTIVERSION]: Packet change requested on non DataPacket typing. {$oldPacket->getName()} | " . $oldPacket::NETWORK_ID);
         }
 
         if ($pk instanceof CustomTranslator) {
             $pk = $pk->translateCustomPacket($oldPacket);
         }
 
-        $pk->setBuffer($oldPacket->buffer, $oldPacket->offset);
         $oldPacket = $pk;
         MainLogger::getLogger()->info("§6[MultiVersion] DEBUG: Modified Packet §8[§f {$oldPacket->getName()} §8| §f".$oldPacket::NETWORK_ID."§8]§6 §a{$type}§6.");
 
