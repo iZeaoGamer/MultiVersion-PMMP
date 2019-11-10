@@ -24,6 +24,10 @@ use pocketmine\network\mcpe\protocol\LoginPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
+use function array_push;
+use function array_search;
+use function array_splice;
+use function in_array;
 
 class PacketManager {
     /** @var ProtocolVersion[] */

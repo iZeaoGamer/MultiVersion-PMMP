@@ -19,6 +19,8 @@ namespace Bavfalcon9\MultiVersion\Utils;
 use Bavfalcon9\MultiVersion\Protocols\CustomTranslator;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\utils\MainLogger;
+use function explode;
+use function implode;
 
 class ProtocolVersion {
     public const DEVELOPER = true; // set to true for debug

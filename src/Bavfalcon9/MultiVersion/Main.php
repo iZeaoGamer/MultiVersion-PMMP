@@ -19,6 +19,8 @@ namespace Bavfalcon9\MultiVersion;
 use pocketmine\plugin\PluginBase;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use Bavfalcon9\MultiVersion\Utils\ProtocolVersion;
+use function define;
+use function scandir;
 
 class Main extends PluginBase {
     public $EventManager;

@@ -101,7 +101,7 @@ class PlayerListPacket extends DataPacket implements CustomTranslator{
      *
      * @return $this
      */
-    public function translateCustomPacket($packet){
+    public function translateCustomPacket(&$packet){
         $this->type = $packet->type;
         foreach($packet->entries as $entry){
             $cache = $entry->skin;

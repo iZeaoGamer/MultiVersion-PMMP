@@ -22,6 +22,9 @@ use pocketmine\utils\MainLogger;
 use pocketmine\utils\Utils;
 use pocketmine\network\mcpe\protocol\LoginPacket as PMLogin;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use function get_class;
+use function json_decode;
+use function unpack;
 
 class LoginPacket extends PMLogin{
     public const NETWORK_ID = 0x01;
@@ -91,7 +94,7 @@ class LoginPacket extends PMLogin{
 
     protected function decodeConnectionRequest() : void{
         $buffer = new BinaryStream($this->getString());
-        $this->chainData = json_decode($buffer->get($buffer->getLInt()), \true);
+        $this->chainData = json_decode($buffer->get($buffer->getLInt()), true);
         foreach($this->chainData["chain"] as $chain){
             $webtoken = Utils::decodeJWT($chain);
             if(isset($webtoken["extraData"])){

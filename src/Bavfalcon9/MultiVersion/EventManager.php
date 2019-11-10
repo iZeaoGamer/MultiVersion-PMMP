@@ -22,6 +22,7 @@ use pocketmine\event\Listener;
 use pocketmine\utils\MainLogger;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
+use function define;
 
 class EventManager implements Listener {
     private $plugin;

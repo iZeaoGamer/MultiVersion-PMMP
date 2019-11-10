@@ -71,7 +71,7 @@ class PlayerSkinPacket extends DataPacket implements CustomTranslator{
      *
      * @return $this
      */
-    public function translateCustomPacket($packet){
+    public function translateCustomPacket(&$packet){
         $skin = $packet->skin;
         $this->uuid = $packet->uuid;
         $this->oldSkinName = "";

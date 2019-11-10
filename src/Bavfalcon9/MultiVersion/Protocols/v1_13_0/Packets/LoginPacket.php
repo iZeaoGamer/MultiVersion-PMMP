@@ -22,6 +22,8 @@ use pocketmine\utils\MainLogger;
 use pocketmine\utils\Utils;
 use pocketmine\network\mcpe\protocol\LoginPacket as PMLogin;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
+use function json_decode;
+use function unpack;
 
 class LoginPacket extends PMLogin{
 
