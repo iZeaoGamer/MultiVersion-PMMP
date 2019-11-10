@@ -1,6 +1,0 @@
-name: MultiVersion
-main: Bavfalcon9\MultiVersion\Main
-version: 1.0.0
-api: [3.0.0]
-load: POSTWORLD
-author: Bavfalcon9
